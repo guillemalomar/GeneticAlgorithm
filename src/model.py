@@ -12,8 +12,8 @@ class Individual:
         self.skin_thickness = 0
         self.strength = 0
 
-    def create(self, **kwargs):
-        self.id= '1' +,
+    def create(self, identifier=None, **kwargs):
+        self.id = identifier
         for key, value in kwargs.items():
             setattr(self, key, value)
 

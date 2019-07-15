@@ -1,5 +1,5 @@
 max_iterations = 1000
-initial_population = 10000
+initial_population_size = 10000
 mutation_factor = 0.1
 
 INDIVIDUALS_PARAMS = {

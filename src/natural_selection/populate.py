@@ -1,21 +1,23 @@
 import random
 
+from src import CURRENT_POPULATION
 from src.model import Individual
-from src.tools import my_sql_wrapper
-from settings import INDIVIDUALS_PARAMS, initial_population
+# from src.tools import my_sql_wrapper
+from settings import INDIVIDUALS_PARAMS, initial_population_size
 
 
 def create_individuals():
-    for i in range(1, initial_population):
-        params = obtain_params(i)
+    for index in range(0, initial_population_size):
+        params = obtain_params(index)
         my_ind = Individual()
-        my_ind.create(**params)
-        my_sql_wrapper.insert_individual(my_ind)
+        my_ind.create(identifier=index, **params)
+        CURRENT_POPULATION.append(my_ind)
+        # my_sql_wrapper.insert_individual(my_ind)
 
 
-def obtain_params(individual_id):
+def obtain_params(index):
     params = {
-        'age': 1,
+        'age': int(index / 200) + 1,
         'iteration': 1
     }
     for k, v in INDIVIDUALS_PARAMS.items():

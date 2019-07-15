@@ -1,9 +1,9 @@
 from settings import max_iterations
 from src.natural_selection.filter import filter_individuals
-from src.natural_selection.reproduct import obtain_children
+from src.natural_selection.reproduct import reproduction_stage
 
 
 def iterate():
-    for i in range(0, max_iterations):
+    for i in range(1, max_iterations+1):
         filter_individuals()
-        obtain_children()
+        reproduction_stage(i)
