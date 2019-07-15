@@ -90,6 +90,10 @@ The algorithm has 3 main phases:
     
     In this subphase the fitting individuals will be paired randomly between them, and a new individual will be added for the next iteration, which will have an average of the parents parameters, multiplied by a random number which represents a random mutation.
     
+    2.3 Natural Death
+    
+    Individuals that are too old cannot reproduce any more and cannot get into the next iteration. These individuals will be eliminated.
+    
 3) Finish
 
     3.1 Plot results

@@ -1,8 +1,10 @@
 max_iterations = 1000
 initial_population = 10000
+mutation_factor = 0.1
 
 INDIVIDUALS_PARAMS = {
-    'arm_reach': [2, 2.5],
+    'height': [1, 1.5],
+    'arm_length': [0, 0.5],
     'speed': [10, 20],
     'strength': [1, 10],
     'jump': [0, 0.5],
@@ -10,9 +12,16 @@ INDIVIDUALS_PARAMS = {
 }
 
 ENVIRONMENT_PARAMS = {
-    'fruit_tree_height': [2.5, 3],
+    'fruit_tree_height': [2, 2.5],
     'temperature': [2.5, 3],
     'predators_speed': [2.5, 3],
     'food_animals_speed': [2.5, 3],
     'food_animals_strength': [2.5, 3]
+}
+
+MYSQL_PARAMS = {
+    'host': 'xxx',
+    'user': 'xxx',
+    'pass': 'xxx',
+    'db': 'xxx'
 }

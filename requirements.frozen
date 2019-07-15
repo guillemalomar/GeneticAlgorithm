@@ -1,0 +1,2 @@
+asyncio==3.4.3
+pymysql==0.9.3
