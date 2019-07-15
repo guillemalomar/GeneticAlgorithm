@@ -17,6 +17,9 @@ class Individual:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+    def set_id(self, new_id):
+        self.id = new_id
+
 
 class Environment:
     def __init__(self):
@@ -25,3 +28,7 @@ class Environment:
         self.predators_speed = 0
         self.food_animals_speed = 0
         self.food_animals_strength = 0
+
+    def create(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)

@@ -3,20 +3,20 @@ import random
 from settings import mutation_factor
 from src.model import Individual
 from settings import initial_population_size
-from src import CURRENT_POPULATION
 
 
-def reproduction_stage(iteration):
+def reproduction_stage(iteration, current_population):
     individuals = []
     for i in range(0, initial_population_size):
         individuals.append(i)
     random.shuffle(individuals)
     new_individuals = []
     for i in range(0, 4000):
-        ind1 = CURRENT_POPULATION[individuals.pop()]
-        ind2 = CURRENT_POPULATION[individuals.pop()]
+        ind1 = current_population[individuals.pop()]
+        ind2 = current_population[individuals.pop()]
         new_individuals.append(obtain_children(i + 8000, iteration, ind1,  ind2))
-    CURRENT_POPULATION.extend(new_individuals)
+    current_population.extend(new_individuals)
+    return current_population
 
 
 def obtain_children(index, iteration, individual1, individual2):
