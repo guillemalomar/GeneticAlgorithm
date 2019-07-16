@@ -20,6 +20,12 @@ class Individual:
     def set_id(self, new_id):
         self.id = new_id
 
+    def set_age(self, new_age):
+        self.age = new_age
+
+    def set_height(self, new_height):
+        self.height = new_height
+
     def print_individual(self):
         print("####\nheight: {}\nspeed: {}\njump: {}\narm_length: {}\nstrength: {}\nreach: {}"
               .format(self.height,

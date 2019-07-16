@@ -1,3 +1,5 @@
 asyncio==3.4.3
+matplotlib==3.1.1
 numpy==1.16.4
 pymysql==0.9.3
+pytest==5.0.1
