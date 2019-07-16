@@ -20,6 +20,13 @@ class Individual:
     def set_id(self, new_id):
         self.id = new_id
 
+    def print_individual(self):
+        print("####\nheight: {}\nspeed: {}\njump: {}\narm_length: {}\nstrength: {}".format(self.height,
+                                                                                     self.speed,
+                                                                                     self.jump,
+                                                                                     self.arm_length,
+                                                                                     self.strength))
+
 
 class Environment:
     def __init__(self):

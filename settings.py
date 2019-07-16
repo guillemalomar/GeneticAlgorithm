@@ -12,11 +12,11 @@ INDIVIDUALS_PARAMS = {
 }
 
 ENVIRONMENT_PARAMS = {
-    'fruit_tree_height': 2.5,
+    'fruit_tree_height': 2,
     'temperature': 20,
-    'predators_speed': 12,
-    'food_animals_speed': 10,
-    'food_animals_strength': 13
+    'predators_speed': 15,
+    'food_animals_speed': 25,
+    'food_animals_strength': 7
 }
 
 MYSQL_PARAMS = {

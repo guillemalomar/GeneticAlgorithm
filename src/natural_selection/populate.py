@@ -18,7 +18,7 @@ def create_individuals():
 
 def obtain_params(index):
     params = {
-        'age': int(index / 200) + 1,
+        'age': int(index / 2000) + 1,
         'iteration': 1
     }
     for k, v in INDIVIDUALS_PARAMS.items():

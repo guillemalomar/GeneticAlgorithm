@@ -18,9 +18,8 @@
 
 ## Requirements
 
-(still a WIP)
-- Python +3.6 
-- asyncio
+- Python +3.6
+- numpy==1.16.4
 
 ## Documentation
 
@@ -125,7 +124,7 @@ Now that the server is running, we can execute the application. This is done by 
 ```
 ### Testing
 
-Some tests have been added to the 'tests' folder. To run them, simply type from the main project folder:
+Some tests will bee added to the 'tests' folder. To run them, simply type from the main project folder:
 ```
 nosetests tests
 ```
@@ -134,8 +133,8 @@ nosetests tests
 
 I have chosen these specific parameters because I think they are useful to show how evolution works. The height/jump - tree height for instance was added because I wanted to check how the algorithm modified the individuals during iterations so that the remaining ones could access the environment resources.
 
-I have decided to use asyncio not only because I wanted to improve my knowledge on the library, but also because I really needed a good parallel library in order to obtain a good performance in the filtering stage.
+I have decided to try to use asyncio not only because I wanted to improve my knowledge on the library, but also because I really needed a good parallel library in order to obtain a good performance in the filtering stage. The parallelization will be added in the near future.
 
 I have decided not to use an API for a few reasons. The dataset used by the algorithm is intern, there are no external outputs, so to have an internal API only to encapsulate the processing code wouldn't make much sense. It would complicate the application without any strong reason.
 
-I still don't know which database I will use. Probably MySQL or MongoDB.
+I still don't know which database I will use. Probably MySQL or MongoDB. Right now everything is working in memory.
