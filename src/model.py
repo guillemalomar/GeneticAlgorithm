@@ -21,11 +21,14 @@ class Individual:
         self.id = new_id
 
     def print_individual(self):
-        print("####\nheight: {}\nspeed: {}\njump: {}\narm_length: {}\nstrength: {}".format(self.height,
-                                                                                     self.speed,
-                                                                                     self.jump,
-                                                                                     self.arm_length,
-                                                                                     self.strength))
+        print("####\nheight: {}\nspeed: {}\njump: {}\narm_length: {}\nstrength: {}\nreach: {}"
+              .format(self.height,
+                      self.speed,
+                      self.jump,
+                      self.arm_length,
+                      self.strength,
+                      self.height + self.jump + self.arm_length
+                      ))
 
 
 class Environment:

@@ -24,17 +24,24 @@ def value_function(individual):
     """
     total_value = 0
     total_value += \
-        max((individual.height + individual.arm_length + individual.jump) / ENVIRONMENT_PARAMS['fruit_tree_height'], 1)
+        (individual.height + individual.arm_length + individual.jump) / ENVIRONMENT_PARAMS['fruit_tree_height']
     total_value += \
-        max(individual.speed / ENVIRONMENT_PARAMS['food_animals_speed'], 1)
+        individual.speed / ENVIRONMENT_PARAMS['food_animals_speed']
     total_value += \
-        max(individual.strength / ENVIRONMENT_PARAMS['food_animals_strength'], 1)
+        individual.strength / ENVIRONMENT_PARAMS['food_animals_strength']
     # total_value += \
     #     individual.skin_thickness
-    if (individual.height + individual.arm_length + individual.jump) < ENVIRONMENT_PARAMS['fruit_tree_height'] or \
-       individual.speed < ENVIRONMENT_PARAMS['food_animals_speed'] or \
-       individual.strength < ENVIRONMENT_PARAMS['food_animals_strength']:
+    if ((individual.height + individual.arm_length + individual.jump) < ENVIRONMENT_PARAMS['fruit_tree_height']) or \
+        (individual.speed < ENVIRONMENT_PARAMS['food_animals_speed'] and
+         individual.strength < ENVIRONMENT_PARAMS['food_animals_strength']):
         total_value = total_value * 0.5
+    if (individual.height + individual.arm_length + individual.jump) / ENVIRONMENT_PARAMS['fruit_tree_height'] > 1.1:
+        total_value = total_value * 0.80
+    if individual.strength / ENVIRONMENT_PARAMS['food_animals_strength'] > 1.1:
+        total_value = total_value * 0.80
+    if min(individual.speed / ENVIRONMENT_PARAMS['food_animals_speed'],
+           individual.speed / ENVIRONMENT_PARAMS['predators_speed']) > 1.1:
+        total_value = total_value * 0.80
     if individual.speed < ENVIRONMENT_PARAMS['predators_speed']:
         total_value = total_value * 0.2
     return total_value

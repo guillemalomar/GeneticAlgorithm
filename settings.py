@@ -1,6 +1,6 @@
 max_iterations = 1000
 initial_population_size = 10000
-mutation_factor = 0.1
+mutation_factor = 0.05
 
 INDIVIDUALS_PARAMS = {
     'height': [1, 1.5],
