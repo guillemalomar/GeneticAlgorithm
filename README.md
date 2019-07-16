@@ -13,6 +13,7 @@
     * [Project Structure](#project-structure)
 * [Using the application](#using-the-application)
     * [Executing](#executing)
+    * [Output](#output)
     * [Testing](#testing)
 * [Decisions taken](#decisions-taken)
 
@@ -73,37 +74,17 @@ An environment is summarized into a reduced set of parameters, which will be key
 
 The algorithm has 3 main phases:
 
-1) Creation of the population and environment
-    
-    In this phase the initial N individuals are created, following the specified parameters. The environment is also created in this phase
+![alt text][logo]
 
-2) Main phase
-
-    This phase contains the main iteratation
-
-    2.1 Selection
-    
-    In this subphase it will be checked if the individuals fit in their environment. The ones that fit will remain in the set for the next iteration, and the ones who doesn't will be eliminated.
-    
-    2.2 Reproduction
-    
-    In this subphase the fitting individuals will be paired randomly between them, and a new individual will be added for the next iteration, which will have an average of the parents parameters, multiplied by a random number which represents a random mutation.
-    
-    2.3 Natural Death
-    
-    Individuals that are too old cannot reproduce any more and cannot get into the next iteration. These individuals will be eliminated.
-    
-3) Finish
-
-    3.1 Plot results
+[logo]: documentation/Diagram.png "Application Architecture"
 
 ### Project Structure
 
 - Application Architecture
 
-![alt text][logo]
+![alt text][logo2]
 
-[logo]: file_url "Application Architecture"
+[logo2]: file_url "Application Architecture"
 
 ## Using the application
 
@@ -122,6 +103,15 @@ Now that the server is running, we can execute the application. This is done by 
 ```
 ~/GeneticAlgorithm$ python src/genetic_algorithm.py
 ```
+
+### Output
+
+The execution results will be stored in the folder _output_. The following is an example of an output:
+
+![alt text][logo3]
+
+[logo3]: output/ExampleOutput.png "Example output"
+
 ### Testing
 
 Some tests will bee added to the 'tests' folder. To run them, simply type from the main project folder:
