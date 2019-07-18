@@ -5,7 +5,7 @@ from settings import INDIVIDUALS_PARAMS as limits, initial_population_size
 
 class PlotWrapper():
     def __init__(self):
-        self.fig = plt.figure(figsize=(20, 15))
+        self.fig = plt.figure(figsize=(12, 9))
         self.fig = self.fig
         self.ax1 = self.fig.add_subplot(4, 2, 1)
         self.ax1.set_title('Average Speed')

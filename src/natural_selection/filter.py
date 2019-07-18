@@ -1,38 +1,59 @@
+import asyncio
+
 from settings import initial_population_size
 
 
 def filter_individuals(current_population, environment):
     """
-    Kill the worse fitting 2000 individuals, depending on their parameters
+
     :param current_population:
     :type current_population: list of individuals
     :return:
     :rtype: list of individuals
     """
-    valued_individuals = []
-    for individual in current_population:
-        individual_value = value_function(individual, environment)
-        individual_value = check_enough_food(individual, individual_value, environment)
-        individual_value = check_too_good(individual, individual_value, environment)
-        individual_value = check_fast_enough(individual, individual_value, environment)
-        valued_individuals.append((individual, individual_value))
+    valued_individuals = asyncio.run(create_evaluation_tasks(current_population, environment))
     valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1])]
     return valued_individuals[int(initial_population_size / 5):]
+
+
+async def create_evaluation_tasks(current_population, environment):
+    tasks = [asyncio.ensure_future(evaluate_individual(individual, environment)) for individual in current_population]
+    responses = await asyncio.gather(*tasks)
+    return responses
+
+
+async def evaluate_individual(individual, environment):
+    """
+    This method obtains an overall value for an individual in an environment
+    :param individual:
+    :type individual:
+    :param environment:
+    :type environment:
+    :return:
+    :rtype:
+    """
+    individual_value = value_function(individual, environment)
+    individual_value = check_enough_food(individual, individual_value, environment)
+    individual_value = check_too_good(individual, individual_value, environment)
+    individual_value = check_fast_enough(individual, individual_value, environment)
+    return individual, individual_value
 
 
 def value_function(individual, environment):
     """
     This method checks how good are the individual parameters
     :param individual:
-    :type individual: Individual
+    :type individual:
+    :param environment:
+    :type environment:
     :return:
-    :rtype: float
+    :rtype:
     """
     total_value = 0
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
     total_value += total_reach / environment['fruit_tree_height']
-    total_value += min(individual['speed'] / environment['food_animals_speed'],
-                       individual['strength'] / environment['food_animals_strength'])
+    total_value += individual['speed'] / environment['food_animals_speed']
+    total_value += individual['strength'] / environment['food_animals_strength']
     # total_value += \
     #     individual['skin_thickness']
     return total_value
