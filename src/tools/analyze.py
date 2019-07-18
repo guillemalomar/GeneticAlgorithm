@@ -11,17 +11,17 @@ def analyze_population(current_population):
     total_reach = 0
     total_not_fitting = 0
     for individual in current_population:
-        total_height += individual.height
-        total_speed += individual.speed
-        total_strength += individual.strength
-        total_arm += individual.arm_length
-        total_jump += individual.jump
-        total_skin += individual.skin_thickness
-        total_reach += individual.height + individual.arm_length + individual.jump
-        if ((individual.height + individual.arm_length + individual.jump) < ENVIRONMENT_PARAMS['fruit_tree_height'] and
-            (individual.speed < ENVIRONMENT_PARAMS['food_animals_speed'] and
-             individual.strength < ENVIRONMENT_PARAMS['food_animals_strength'])) or \
-           individual.speed < ENVIRONMENT_PARAMS['predators_speed']:
+        total_height += individual['height']
+        total_speed += individual['speed']
+        total_strength += individual['strength']
+        total_arm += individual['arm_length']
+        total_jump += individual['jump']
+        total_skin += individual['skin_thickness']
+        total_reach += individual['height'] + individual['arm_length'] + individual['jump']
+        if ((individual['height'] + individual['arm_length'] + individual['jump']) < ENVIRONMENT_PARAMS['fruit_tree_height'] and
+            (individual['speed'] < ENVIRONMENT_PARAMS['food_animals_speed'] and
+             individual['strength'] < ENVIRONMENT_PARAMS['food_animals_strength'])) or \
+           individual['speed'] < ENVIRONMENT_PARAMS['predators_speed']:
             total_not_fitting += 1
     avgs = {
         'avg_height': total_height / len(current_population),
