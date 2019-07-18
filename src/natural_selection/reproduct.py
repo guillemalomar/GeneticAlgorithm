@@ -13,15 +13,18 @@ def reproduction_stage(iteration, current_population):
     old_individuals = []
     new_individuals = []
     for i in range(0, 4000):
-        rand_ind1 = individuals.pop()
-        ind1 = current_population[rand_ind1]
-        ind1['id'] = i
-        rand_ind2 = individuals.pop()
-        ind2 = current_population[rand_ind2]
-        ind2['id'] = i+4000
-        old_individuals.append(ind1)
-        old_individuals.append(ind2)
-        new_individuals.append(obtain_children(i + 8000, iteration, ind1,  ind2))
+        try:
+            rand_ind1 = individuals.pop()
+            ind1 = current_population[rand_ind1]
+            ind1['id'] = i
+            rand_ind2 = individuals.pop()
+            ind2 = current_population[rand_ind2]
+            ind2['id'] = i+4000
+            old_individuals.append(ind1)
+            old_individuals.append(ind2)
+            new_individuals.append(obtain_children(i + 8000, iteration, ind1,  ind2))
+        except Exception as exc:
+            print(exc)
     old_individuals.extend(new_individuals)
     return old_individuals
 
