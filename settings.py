@@ -1,4 +1,4 @@
-max_iterations = 100
+max_iterations = 50
 initial_population_size = 10000
 mutation_factor = 0.05
 
@@ -12,7 +12,7 @@ INDIVIDUALS_PARAMS = {
 }
 
 ENVIRONMENTS = {
-    'Jungle': {
+    'Bayou': {
         'fruit_tree_height': 1.5,
         'temperature': 20,
         'predators_speed': 17,
@@ -22,7 +22,7 @@ ENVIRONMENTS = {
     'Tundra': {
         'fruit_tree_height': 4,
         'temperature': -10,
-        'predators_speed': 15,
+        'predators_speed': 18,
         'food_animals_speed': 15,
         'food_animals_strength': 7
     },

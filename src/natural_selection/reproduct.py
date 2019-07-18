@@ -1,3 +1,4 @@
+import asyncio
 import numpy as np
 import random
 
@@ -11,25 +12,33 @@ def reproduction_stage(iteration, current_population):
         individuals.append(i)
     random.shuffle(individuals)
     old_individuals = []
-    new_individuals = []
+    list_of_pairs = []
     for i in range(0, int(initial_population_size/2.5)):
-        try:
-            rand_ind1 = individuals.pop()
-            ind1 = current_population[rand_ind1]
-            ind1['id'] = i
-            rand_ind2 = individuals.pop()
-            ind2 = current_population[rand_ind2]
-            ind2['id'] = i+int(initial_population_size/2.5)
-            old_individuals.append(ind1)
-            old_individuals.append(ind2)
-            new_individuals.append(obtain_children(i + (initial_population_size / 1.25), iteration, ind1,  ind2))
-        except Exception as exc:
-            print(exc)
+        rand_1 = individuals.pop()
+        ind1 = current_population[rand_1]
+        ind1['id'] = i
+        rand_2 = individuals.pop()
+        ind2 = current_population[rand_2]
+        ind2['id'] = i + int(initial_population_size/2.5)
+        old_individuals.append(ind1)
+        old_individuals.append(ind2)
+        list_of_pairs.append((ind1, ind2))
+    new_individuals = asyncio.run(pair_individuals(list_of_pairs, iteration))
     old_individuals.extend(new_individuals)
     return old_individuals
 
 
-def obtain_children(index, iteration, individual1, individual2):
+async def pair_individuals(list_of_pairs, iteration):
+    tasks = []
+    for ind, pair in enumerate(list_of_pairs):
+        tasks.append(asyncio.ensure_future(
+            obtain_children(ind + int(initial_population_size / 1.25), iteration, pair[0], pair[1]))
+        )
+    responses = await asyncio.gather(*tasks)
+    return responses
+
+
+async def obtain_children(index, iteration, individual1, individual2):
     child = dict()
     child['index'] = index
     child['age'] = int(index / (initial_population_size / 5)) + iteration
