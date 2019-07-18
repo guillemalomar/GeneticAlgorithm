@@ -23,6 +23,7 @@ class PlotWrapper():
         self.ax8.set_title('Individuals not fitting')
         plt.xlabel("Iterations")
         plt.tight_layout()
+        plt.gcf().subplots_adjust(bottom=0.15)
 
     def add_data(self, results, iteration):
         self.ax1.scatter(iteration, results['avg_speed'])

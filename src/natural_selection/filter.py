@@ -30,13 +30,12 @@ def value_function(individual):
     """
     total_value = 0
     total_value += \
-        (individual.height + individual.arm_length + individual.jump) / ENVIRONMENT_PARAMS['fruit_tree_height']
+        (individual['height'] + individual['arm_length'] + individual['jump']) / ENVIRONMENT_PARAMS['fruit_tree_height']
     total_value += \
-        individual.speed / ENVIRONMENT_PARAMS['food_animals_speed']
-    total_value += \
-        individual.strength / ENVIRONMENT_PARAMS['food_animals_strength']
+        min(individual['speed'] / ENVIRONMENT_PARAMS['food_animals_speed'],
+            individual['strength'] / ENVIRONMENT_PARAMS['food_animals_strength'])
     # total_value += \
-    #     individual.skin_thickness
+    #     individual['skin_thickness']
     return total_value
 
 
@@ -50,9 +49,9 @@ def check_enough_food(individual, total_value):
     :return:
     :rtype: float
     """
-    if ((individual.height + individual.arm_length + individual.jump) < ENVIRONMENT_PARAMS['fruit_tree_height']) or \
-        (individual.speed < ENVIRONMENT_PARAMS['food_animals_speed'] and
-         individual.strength < ENVIRONMENT_PARAMS['food_animals_strength']):
+    if (individual['total_reach'] < ENVIRONMENT_PARAMS['fruit_tree_height']) or \
+        (individual['speed'] < ENVIRONMENT_PARAMS['food_animals_speed'] and
+         individual['strength'] < ENVIRONMENT_PARAMS['food_animals_strength']):
         total_value = total_value * 0.5
     return total_value
 
@@ -68,13 +67,21 @@ def check_too_good(individual, total_value):
     :return:
     :rtype: float
     """
-    if (individual.height + individual.arm_length + individual.jump) / ENVIRONMENT_PARAMS['fruit_tree_height'] > 1.1:
+    ind_speed_vs_predator = individual['speed'] / ENVIRONMENT_PARAMS['predators_speed']
+    ind_speed_vs_food = individual['speed'] / ENVIRONMENT_PARAMS['food_animals_speed']
+    ind_strength_vs_food = individual['strength'] / ENVIRONMENT_PARAMS['food_animals_strength']
+
+    if individual['total_reach'] / ENVIRONMENT_PARAMS['fruit_tree_height'] > 1.1:
         total_value = total_value * 0.80
-    if individual.strength / ENVIRONMENT_PARAMS['food_animals_strength'] > 1.1:
+
+    if ind_speed_vs_food > 1.1:
         total_value = total_value * 0.80
-    if min(individual.speed / ENVIRONMENT_PARAMS['food_animals_speed'],
-           individual.speed / ENVIRONMENT_PARAMS['predators_speed']) > 1.1:
+        if ind_strength_vs_food > 1.1:
+            total_value = total_value * 0.80
+
+    if ind_speed_vs_predator > 1.1:
         total_value = total_value * 0.80
+
     return total_value
 
 
@@ -88,7 +95,7 @@ def check_fast_enough(individual, total_value):
     :return:
     :rtype: float
     """
-    if individual.speed < ENVIRONMENT_PARAMS['predators_speed']:
+    if individual['speed'] < ENVIRONMENT_PARAMS['predators_speed']:
         total_value = total_value * 0.2
     return total_value
 
@@ -101,6 +108,6 @@ def natural_death(iteration, current_population):
     """
     young_individuals = []
     for individual in current_population:
-        if individual.age > iteration:
+        if individual['age'] > iteration:
             young_individuals.append(individual)
     return young_individuals[0: initial_population_size]

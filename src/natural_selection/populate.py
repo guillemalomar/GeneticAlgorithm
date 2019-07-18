@@ -1,26 +1,25 @@
 import random
 
-from src.model import Individual
-# from src.tools import my_sql_wrapper
+from src.tools import my_mongo_wrapper
 from settings import INDIVIDUALS_PARAMS, initial_population_size
 
 
 def create_individuals():
     current_population = []
+    my_mongo_wrapper.create_collection(1)
     for index in range(0, initial_population_size):
         params = obtain_params(index)
-        my_ind = Individual()
-        my_ind.create(identifier=index, **params)
-        current_population.append(my_ind)
-        # my_sql_wrapper.insert_individual(my_ind)
+        my_mongo_wrapper.insert_document_into_collection(1, params)
     return current_population
 
 
 def obtain_params(index):
     params = {
+        'id': index,
         'age': int(index / 2000) + 1,
         'iteration': 1
     }
     for k, v in INDIVIDUALS_PARAMS.items():
         params[k] = round(random.uniform(v[0], v[1]), 3)
+    params['total_reach'] = round(params['height'] + params['jump'] + params['arm_length'], 3)
     return params
