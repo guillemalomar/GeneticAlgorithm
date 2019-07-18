@@ -25,19 +25,18 @@ class MongoDBWrapper:
     def delete_database(self, db_name):
         self.client.drop_database(db_name)
 
-    def create_collection(self, iteration):
-        self.collections[iteration] = self.db['Iteration{}'.format(iteration)]
+    def create_collection(self, collection_name, iteration):
+        self.collections['{}{}'.format(collection_name, iteration)] = self.db['{}{}'.format(collection_name, iteration)]
 
-    def delete_collection(self, iteration):
-        my_col = self.collections[iteration]
+    def delete_collection(self, collection_name, iteration):
+        my_col = self.collections['{}{}'.format(collection_name, iteration)]
         my_col.drop()
 
-    def insert_document_into_collection(self, iteration, document):
-        self.collections[iteration].insert_one(document)
+    def insert_document_into_collection(self, collection_name, iteration, document):
+        self.collections['{}{}'.format(collection_name, iteration)].insert_one(document)
 
-    def insert_documents_into_collection(self, iteration, documents):
-        for document in documents:
-            self.collections[iteration].insert_one(document)
+    def insert_documents_into_collection(self, collection_name, iteration, documents):
+        self.collections['{}{}'.format(collection_name, iteration)].insert_many(documents)
 
-    def obtain_all_documents(self, iteration):
-        return self.collections[iteration].find({})
+    def obtain_all_documents(self, collection_name, iteration):
+        return self.collections['{}{}'.format(collection_name, iteration)].find({})
