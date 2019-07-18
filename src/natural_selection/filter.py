@@ -17,7 +17,7 @@ def filter_individuals(current_population, environment):
         individual_value = check_fast_enough(individual, individual_value, environment)
         valued_individuals.append((individual, individual_value))
     valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1])]
-    return valued_individuals[2000:]
+    return valued_individuals[int(initial_population_size / 5):]
 
 
 def value_function(individual, environment):
@@ -29,11 +29,10 @@ def value_function(individual, environment):
     :rtype: float
     """
     total_value = 0
-    total_value += \
-        (individual['height'] + individual['arm_length'] + individual['jump']) / environment['fruit_tree_height']
-    total_value += \
-        min(individual['speed'] / environment['food_animals_speed'],
-            individual['strength'] / environment['food_animals_strength'])
+    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
+    total_value += total_reach / environment['fruit_tree_height']
+    total_value += min(individual['speed'] / environment['food_animals_speed'],
+                       individual['strength'] / environment['food_animals_strength'])
     # total_value += \
     #     individual['skin_thickness']
     return total_value
@@ -72,12 +71,12 @@ def check_too_good(individual, total_value, environment):
     ind_strength_vs_food = individual['strength'] / environment['food_animals_strength']
 
     if individual['total_reach'] / environment['fruit_tree_height'] > 1.1:
-        total_value = total_value * 0.70
+        total_value = total_value * 0.50
 
     if ind_speed_vs_food > 1.1:
-        total_value = total_value * 0.80
+        total_value = total_value * 0.70
         if ind_strength_vs_food > 1.1:
-            total_value = total_value * 0.80
+            total_value = total_value * 0.70
 
     if ind_speed_vs_predator > 1.1:
         total_value = total_value * 0.80

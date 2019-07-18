@@ -5,7 +5,7 @@ from settings import INDIVIDUALS_PARAMS as limits, initial_population_size
 
 class PlotWrapper():
     def __init__(self):
-        self.fig = plt.figure(figsize=(20, 10))
+        self.fig = plt.figure(figsize=(20, 15))
         self.fig = self.fig
         self.ax1 = self.fig.add_subplot(4, 2, 1)
         self.ax1.set_title('Average Speed')
@@ -35,6 +35,12 @@ class PlotWrapper():
         plt.tight_layout()
         plt.gcf().subplots_adjust(bottom=0.1, right=0.9, left=0.1, top=0.9)
 
+    def add_limits(self, environment):
+        self.ax1.axhline(y=environment['predators_speed'], c="red", linewidth=0.5, zorder=0)
+        self.ax1.axhline(y=environment['food_animals_speed'], c="blue", linewidth=0.5, zorder=0)
+        self.ax2.axhline(y=environment['food_animals_strength'], c="blue", linewidth=0.5, zorder=0)
+        self.ax7.axhline(y=environment['fruit_tree_height'], c="blue", linewidth=0.5, zorder=0)
+
     def add_data(self, results, iteration):
         self.ax1.scatter(iteration, results['avg_speed'])
         self.ax2.scatter(iteration, results['avg_strength'])
@@ -46,5 +52,5 @@ class PlotWrapper():
         self.ax8.scatter(iteration, results['not_fitting'])
 
     def save_results(self, plot_name):
-        self.fig.suptitle(plot_name, fontsize=16)
+        self.fig.suptitle(plot_name, fontsize=20)
         plt.savefig("../output/{}.png".format(plot_name), transparent=False)

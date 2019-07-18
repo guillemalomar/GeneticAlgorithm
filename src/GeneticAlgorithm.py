@@ -5,6 +5,7 @@ from settings import ENVIRONMENTS as environments
 
 if __name__ == '__main__':
     for environment_name, environment_params in environments.items():
+        my_plot.add_limits(environment_params)
         initial_population = create_individuals(environment_name)
         fitting_population = iterate(initial_population, (environment_name, environment_params))
         my_plot.save_results('{}'.format(environment_name))

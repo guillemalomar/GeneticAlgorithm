@@ -1,4 +1,4 @@
-max_iterations = 500
+max_iterations = 100
 initial_population_size = 10000
 mutation_factor = 0.05
 
@@ -27,7 +27,7 @@ ENVIRONMENTS = {
         'food_animals_strength': 7
     },
     'Savannah': {
-        'fruit_tree_height': 2,
+        'fruit_tree_height': 2.9,
         'temperature': 25,
         'predators_speed': 15,
         'food_animals_speed': 30,
