@@ -3,29 +3,36 @@ import logging
 import numpy as np
 import random
 
-from settings.settings import mutation_factor
-from settings.settings import initial_population_size, INDIVIDUALS_PARAMS
+from settings.settings import mutation_factor, initial_population_size, INDIVIDUALS_PARAMS
 
 
 def reproduction_stage(iteration, current_population):
-    individuals = []
-    for i in range(0, initial_population_size - int(initial_population_size / 2.5)):
-        individuals.append(i)
+    individuals = obtain_randomized_individuals(len(current_population))
+    list_of_pairs, new_iter_individuals = obtain_randomized_pairs_of_individuals(individuals, current_population)
+    newly_created_individuals = asyncio.run(pair_individuals(list_of_pairs, iteration))
+    logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
+    new_iter_individuals.extend(newly_created_individuals)
+    return new_iter_individuals
+
+
+def obtain_randomized_individuals(number):
+    individuals = [i for i in range(0, number)]
     random.shuffle(individuals)
-    old_individuals = []
+    return individuals
+
+
+def obtain_randomized_pairs_of_individuals(random_individuals, current_population):
+    new_iter_individuals = []
     list_of_pairs = []
     for i in range(0, int(initial_population_size * 0.3)):
-        ind1 = current_population[individuals.pop()]
+        ind1 = current_population[random_individuals.pop()]
         ind1['id'] = i
-        old_individuals.append(ind1)
-        ind2 = current_population[individuals.pop()]
+        new_iter_individuals.append(ind1)
+        ind2 = current_population[random_individuals.pop()]
         ind2['id'] = i + int(initial_population_size * 0.3)
-        old_individuals.append(ind2)
+        new_iter_individuals.append(ind2)
         list_of_pairs.append((ind1, ind2))
-    new_individuals = asyncio.run(pair_individuals(list_of_pairs, iteration))
-    logging.debug("Created {} new individuals".format(len(new_individuals)))
-    old_individuals.extend(new_individuals)
-    return old_individuals
+    return list_of_pairs, new_iter_individuals
 
 
 async def pair_individuals(list_of_pairs, iteration):
