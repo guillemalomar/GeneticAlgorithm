@@ -13,7 +13,7 @@ def filter_individuals(current_population, environment):
     """
     valued_individuals = asyncio.run(create_evaluation_tasks(current_population, environment))
     valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1])]
-    return valued_individuals[int(initial_population_size / 5):]
+    return valued_individuals[int(initial_population_size * 0.4):]
 
 
 async def create_evaluation_tasks(current_population, environment):
@@ -51,7 +51,7 @@ def value_function(individual, environment):
     """
     total_value = 0
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
-    total_value += total_reach / environment['fruit_tree_height']
+    total_value += total_reach / environment['tree_height']
     total_value += individual['speed'] / environment['food_animals_speed']
     total_value += individual['strength'] / environment['food_animals_strength']
     # total_value += \
@@ -69,7 +69,7 @@ def check_enough_food(individual, total_value, environment):
     :return:
     :rtype: float
     """
-    if (individual['total_reach'] < environment['fruit_tree_height']) or \
+    if (individual['total_reach'] < environment['tree_height']) or \
         (individual['speed'] < environment['food_animals_speed'] and
          individual['strength'] < environment['food_animals_strength']):
         total_value = total_value * 0.5
@@ -91,18 +91,34 @@ def check_too_good(individual, total_value, environment):
     ind_speed_vs_food = individual['speed'] / environment['food_animals_speed']
     ind_strength_vs_food = individual['strength'] / environment['food_animals_strength']
 
-    if individual['total_reach'] / environment['fruit_tree_height'] > 1.1:
+    if individual['total_reach'] / environment['tree_height'] > 1.1:
         total_value = total_value * 0.50
 
     if ind_speed_vs_food > 1.1:
-        total_value = total_value * 0.70
+        if is_fast_enough(individual, environment):
+            total_value = total_value * 0.70
         if ind_strength_vs_food > 1.1:
             total_value = total_value * 0.70
 
     if ind_speed_vs_predator > 1.1:
-        total_value = total_value * 0.80
+        total_value = total_value * 0.90
 
     return total_value
+
+
+def is_fast_enough(individual, environment):
+    """
+
+    :param individual:
+    :type individual:
+    :param environment:
+    :type environment:
+    :return:
+    :rtype:
+    """
+    if individual['speed'] < environment['predators_speed']:
+        return False
+    return True
 
 
 def check_fast_enough(individual, total_value, environment):
@@ -115,8 +131,10 @@ def check_fast_enough(individual, total_value, environment):
     :return:
     :rtype: float
     """
-    if individual['speed'] < environment['predators_speed']:
+    if not is_fast_enough(individual, environment):
         total_value = total_value * 0.2
+    else:
+        total_value = total_value * 1.5
     return total_value
 
 

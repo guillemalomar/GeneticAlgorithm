@@ -1,4 +1,3 @@
-from settings import max_iterations
 from src.natural_selection.filter import filter_individuals, natural_death
 from src.natural_selection.reproduct import reproduction_stage
 from src.tools.analyze import analyze_population
@@ -6,7 +5,7 @@ from src.tools import my_plot
 from src.tools import my_mongo_wrapper
 
 
-def iterate(current_population, environment):
+def iterate(max_iterations, current_population, environment):
     for iteration in range(1, max_iterations+1):
         if iteration > 1:
             my_mongo_wrapper.delete_collection(environment[0], iteration - 1)

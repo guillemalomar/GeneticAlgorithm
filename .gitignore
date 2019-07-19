@@ -105,4 +105,5 @@ venv.bak/
 .idea
 
 creds.py
-output/Result*
+output/*
+!output/ExampleOutput.png
