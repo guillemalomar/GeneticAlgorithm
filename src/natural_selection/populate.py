@@ -1,7 +1,8 @@
+import logging
 import random
 
 from src.tools import check_and_return_db
-from settings import INDIVIDUALS_PARAMS, initial_population_size
+from settings.settings import INDIVIDUALS_PARAMS, initial_population_size
 
 
 def create_individuals(environment_name):
@@ -13,6 +14,7 @@ def create_individuals(environment_name):
         current_population.append(params)
         if check_and_return_db():
             check_and_return_db().insert_document_into_collection(environment_name, 1, params)
+    logging.debug("Created a starting set of {} individuals".format(initial_population_size))
     return current_population
 
 

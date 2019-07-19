@@ -1,9 +1,10 @@
 import asyncio
+import logging
 import numpy as np
 import random
 
-from settings import mutation_factor
-from settings import initial_population_size, INDIVIDUALS_PARAMS
+from settings.settings import mutation_factor
+from settings.settings import initial_population_size, INDIVIDUALS_PARAMS
 
 
 def reproduction_stage(iteration, current_population):
@@ -14,16 +15,15 @@ def reproduction_stage(iteration, current_population):
     old_individuals = []
     list_of_pairs = []
     for i in range(0, int(initial_population_size * 0.3)):
-        rand_1 = individuals.pop()
-        ind1 = current_population[rand_1]
+        ind1 = current_population[individuals.pop()]
         ind1['id'] = i
-        rand_2 = individuals.pop()
-        ind2 = current_population[rand_2]
-        ind2['id'] = i + int(initial_population_size * 0.3)
         old_individuals.append(ind1)
+        ind2 = current_population[individuals.pop()]
+        ind2['id'] = i + int(initial_population_size * 0.3)
         old_individuals.append(ind2)
         list_of_pairs.append((ind1, ind2))
     new_individuals = asyncio.run(pair_individuals(list_of_pairs, iteration))
+    logging.debug("Created {} new individuals".format(len(new_individuals)))
     old_individuals.extend(new_individuals)
     return old_individuals
 

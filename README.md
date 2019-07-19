@@ -30,7 +30,7 @@
 
 ### Explanation
 
-This project is an example of the most classic Genetic Algorithm problem.
+This project is an example of the most classic Genetic Algorithm problem. It will obtain 1 or more environments, will create a set of individuals with random parameters values within a specified range, and will see how these parameters change with the iterations.
 
 **Model**
 
@@ -38,7 +38,7 @@ The model is divided in two parts. The population model and the environment mode
 
 ###### Population Model
 
-Each individuals is summarized into a reduced set of parameters, which will be key for his/her future:
+Each individual is summarized into a reduced set of parameters, which will be key for his/her future:
 
 - Arm reach: How height can the individual take fruits from trees without jumping.
 - Speed: How fast can the individual run.
@@ -52,9 +52,12 @@ Ranges of values
 |------------------------------------|------|-----|-------|
 | Arm reach                          | 2    | 2.5 | m     |
 | Speed                              | 10   | 20  | km/h  |
-| Strength: Range of values: 1 - 10  | 1    | 10  |       |
+| Strength                           | 1    | 10  |       |
 | Skin Thickness                     | 0.05 | 2   | mm    |
 | Jump                               | 0    | 0.5 | m     |
+| Height                             | 1    | 1.5 | m     |
+
+These are the default ranges, but can be modified in the settings/settings.py file.
 
 ###### Environment Model
 

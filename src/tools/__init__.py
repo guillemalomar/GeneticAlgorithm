@@ -1,3 +1,5 @@
+import logging
+
 from src.tools.plot import PlotWrapper
 
 
@@ -9,6 +11,7 @@ def set_db(activate):
     from src.tools.mongodb_wrapper import MongoDBWrapper
     global my_mongo_wrapper
     if activate:
+        logging.debug("MongoDB will be used in this execution")
         my_mongo_wrapper = MongoDBWrapper()
     else:
         my_mongo_wrapper = False

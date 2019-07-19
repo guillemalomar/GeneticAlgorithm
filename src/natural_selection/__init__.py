@@ -1,3 +1,5 @@
+import logging
+
 from src.natural_selection.filter import filter_individuals, natural_death
 from src.natural_selection.reproduct import reproduction_stage
 from src.tools.analyze import analyze_population
@@ -7,6 +9,8 @@ from src.tools import check_and_return_db
 
 def iterate(max_iterations, current_population, environment):
     for iteration in range(1, max_iterations+1):
+        if iteration % int(max_iterations / 10) == 0:
+            logging.info("Iteration: {}".format(iteration))
         if check_and_return_db():
             if iteration > 1:
                 check_and_return_db().delete_collection(environment[0], iteration - 1)
