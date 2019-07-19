@@ -8,18 +8,18 @@ from settings import initial_population_size, INDIVIDUALS_PARAMS
 
 def reproduction_stage(iteration, current_population):
     individuals = []
-    for i in range(0, initial_population_size - int(initial_population_size / 5)):
+    for i in range(0, initial_population_size - int(initial_population_size / 2.5)):
         individuals.append(i)
     random.shuffle(individuals)
     old_individuals = []
     list_of_pairs = []
-    for i in range(0, int(initial_population_size/2.5)):
+    for i in range(0, int(initial_population_size * 0.3)):
         rand_1 = individuals.pop()
         ind1 = current_population[rand_1]
         ind1['id'] = i
         rand_2 = individuals.pop()
         ind2 = current_population[rand_2]
-        ind2['id'] = i + int(initial_population_size/2.5)
+        ind2['id'] = i + int(initial_population_size * 0.3)
         old_individuals.append(ind1)
         old_individuals.append(ind2)
         list_of_pairs.append((ind1, ind2))
@@ -31,8 +31,23 @@ def reproduction_stage(iteration, current_population):
 async def pair_individuals(list_of_pairs, iteration):
     tasks = []
     for ind, pair in enumerate(list_of_pairs):
-        tasks.append(asyncio.ensure_future(
-            obtain_children(ind + int(initial_population_size / 1.25), iteration, pair[0], pair[1]))
+        tasks.append(
+            asyncio.ensure_future(
+                obtain_children(ind + int(initial_population_size * 0.6),
+                                iteration,
+                                pair[0],
+                                pair[1]
+                                )
+            )
+        )
+        tasks.append(
+            asyncio.ensure_future(
+                obtain_children(ind + int(initial_population_size * 0.6) + int(initial_population_size * 0.3),
+                                iteration,
+                                pair[0],
+                                pair[1]
+                                )
+            )
         )
     responses = await asyncio.gather(*tasks)
     return responses
