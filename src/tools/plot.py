@@ -1,6 +1,7 @@
+import logging
 import matplotlib.pyplot as plt
 
-from settings import INDIVIDUALS_PARAMS as limits, initial_population_size
+from settings.settings import INDIVIDUALS_PARAMS as limits, initial_population_size
 
 
 class PlotWrapper:
@@ -47,3 +48,4 @@ class PlotWrapper:
     def save_results(self, plot_name):
         self.fig.suptitle(plot_name, fontsize=20)
         plt.savefig("output/{}.png".format(plot_name), transparent=False)
+        logging.info("Results saved in the following file: output/{}.png".format(plot_name))

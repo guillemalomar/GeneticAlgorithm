@@ -1,6 +1,7 @@
 import asyncio
+import logging
 
-from settings import initial_population_size
+from settings.settings import initial_population_size
 
 
 def filter_individuals(current_population, environment):
@@ -13,7 +14,9 @@ def filter_individuals(current_population, environment):
     """
     valued_individuals = asyncio.run(create_evaluation_tasks(current_population, environment))
     valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1])]
-    return valued_individuals[int(initial_population_size * 0.4):]
+    valued_individuals = valued_individuals[int(initial_population_size * 0.4):]
+    logging.debug("Deleted {} individuals".format(int(initial_population_size * 0.4)))
+    return valued_individuals
 
 
 async def create_evaluation_tasks(current_population, environment):
@@ -148,4 +151,6 @@ def natural_death(iteration, current_population):
     for individual in current_population:
         if individual['age'] > iteration:
             young_individuals.append(individual)
-    return young_individuals[0: initial_population_size]
+    young_individuals = young_individuals[0: initial_population_size]
+    logging.debug("{} individuals died of natural causes".format(int(len(current_population) - len(young_individuals))))
+    return young_individuals

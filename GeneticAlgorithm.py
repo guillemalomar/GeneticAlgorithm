@@ -1,10 +1,14 @@
 import argparse
+import logging
 import sys
 
 from src.natural_selection.populate import create_individuals
 from src.natural_selection import iterate
 from src.tools import my_plot, set_db
-from settings import ENVIRONMENTS, ENVIRONMENT_DEFAULT, max_iterations
+from settings.settings import ENVIRONMENTS, ENVIRONMENT_DEFAULT, max_iterations
+from settings.logger import set_logger
+
+set_logger()
 
 
 def args_handler(argv):
@@ -21,6 +25,10 @@ def args_handler(argv):
     p.add_argument('-db', '--db', action='store_true',
                    default=False,
                    help='Use MongoDB.')
+
+    p.add_argument('-a', '--about', action='store_true',
+                   default=False,
+                   help='Some information about the code.')
 
     p.add_argument('-c', '--custom', action='store_true',
                    default=False,
@@ -53,9 +61,32 @@ def args_handler(argv):
     return p.parse_args(argv[1:])
 
 
+def execute_genetic_algorithm(iterations, environment_name, environment_params):
+    logging.info(20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" +
+                 "Executing with the following parameters:\n" +
+                 "Environment name: {}\n -".format(environment_name) +
+                 "\n -".join(['{}: {}'.format(key, value) for key, value in environment_params.items()]))
+    my_plot.add_limits(environment_params)
+    logging.info("*** Population stage ***")
+    initial_population = create_individuals(environment_name)
+    logging.info("*** Iteration stage ***")
+    iterate(iterations, initial_population, (environment_name, environment_params))
+    logging.info("*** Closing stage ***")
+    my_plot.save_results('{}'.format(environment_name))
+
+
 def _main(argv):
 
     args = args_handler(argv)
+
+    if args.about:
+        print(30 * "#" + " Genetic Algorithm " + 31 * "#")
+        print("# This project is an example of the most classic Genetic Algorithm problem.    # \n" +
+              "# It will obtain 1 or more environments, will create a set of individuals with # \n" +
+              "# random parameters values within a specified range, and will see how these    # \n" +
+              "# parameters change with the iterations.                                       # \n")
+        print(80 * "#")
+        sys.exit()
 
     set_db(args.db)
 
@@ -68,18 +99,17 @@ def _main(argv):
             'food_animals_speed': args.food_animals_speed,
             'food_animals_strength': args.food_animals_strength
         }
-        my_plot.add_limits(environment_params)
-        initial_population = create_individuals(environment_name)
-        iterate(args.iterations, initial_population, (environment_name, environment_params))
-        my_plot.save_results('{}'.format(environment_name))
+        execute_genetic_algorithm(args.iterations, environment_name, environment_params)
     else:
         for environment_name, environment_params in ENVIRONMENTS.items():
-            my_plot.add_limits(environment_params)
-            initial_population = create_individuals(environment_name)
-            iterate(args.iterations, initial_population, (environment_name, environment_params))
-            my_plot.save_results('{}'.format(environment_name))
+            execute_genetic_algorithm(args.iterations, environment_name, environment_params)
             my_plot.__init__()
 
 
 if __name__ == '__main__':
-    _main(sys.argv)
+    try:
+        _main(sys.argv)
+    except (KeyboardInterrupt, SystemExit):
+        print("Execution cancelled manually")
+        logging.info("Execution cancelled")
+        sys.exit()

@@ -107,3 +107,4 @@ venv.bak/
 creds.py
 output/*
 !output/ExampleOutput.png
+genetic_algorithm.log
