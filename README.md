@@ -23,7 +23,7 @@
 - asyncio 3.4.3
 - matplotlib 3.1.1
 - numpy 1.16.4
-- pymongo 3.8.0
+- pymongo 3.8.0 (optional)
 - pytest 5.0.1
 
 ## Documentation
@@ -118,7 +118,7 @@ You can define a custom environment by activating the custom flag, and passing t
 
 ```
 -> % python GeneticAlgorithm.py -h
-usage: GeneticAlgorithm.py [-h] [-i ITERATIONS] [-c] [-n NAME]
+usage: GeneticAlgorithm.py [-h] [-i ITERATIONS] [-db] [-c] [-n NAME]
                            [-th TREE_HEIGHT] [-t TEMPERATURE]
                            [-ps PREDATORS_SPEED] [-asp FOOD_ANIMALS_SPEED]
                            [-ast FOOD_ANIMALS_STRENGTH]
@@ -129,6 +129,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -i ITERATIONS, --iterations ITERATIONS
                         Number of iterations to run.
+  -db, --db             Use MongoDB.
   -c, --custom          Flag to activate custom mode, to use environment parameters given by the user.
   -n NAME, --name NAME  Name of the custom execution.
   -th TREE_HEIGHT, --tree_height TREE_HEIGHT
@@ -166,7 +167,7 @@ I have decided to try to use asyncio not only because I wanted to improve my kno
 
 I have decided not to use an API for a few reasons. The dataset used by the algorithm is intern, there are no external outputs, so to have an internal API only to encapsulate the processing code wouldn't make much sense. It would complicate the application without any strong reason.
 
-I'm using MongoDB because the kind of data that I use fits really well (dictionaries) and with MongoDB Compass I can obtain some valuable information from resulting datasets.
+I'm using MongoDB because the kind of data that I use fits really well (dictionaries) and with MongoDB Compass I can obtain some valuable information from resulting datasets. It would be interesting to, instead of simply storing and obtaining all individuals in every iteration, reading and writing individuals 1 by 1. This is not needed right now as the set fits in memory, but it could be a need if we want to use much bigger sets.
 
 ![alt text][logo4]
 

@@ -132,9 +132,9 @@ def check_fast_enough(individual, total_value, environment):
     :rtype: float
     """
     if not is_fast_enough(individual, environment):
-        total_value = total_value * 0.2
+        total_value = total_value * 0.1
     else:
-        total_value = total_value * 1.5
+        total_value = total_value * 2
     return total_value
 
 

@@ -3,7 +3,7 @@ import sys
 
 from src.natural_selection.populate import create_individuals
 from src.natural_selection import iterate
-from src.tools import my_plot
+from src.tools import my_plot, set_db
 from settings import ENVIRONMENTS, ENVIRONMENT_DEFAULT, max_iterations
 
 
@@ -17,6 +17,10 @@ def args_handler(argv):
     p.add_argument('-i', '--iterations', action='store', type=int,
                    default=max_iterations,
                    help='Number of iterations to run.')
+
+    p.add_argument('-db', '--db', action='store_true',
+                   default=False,
+                   help='Use MongoDB.')
 
     p.add_argument('-c', '--custom', action='store_true',
                    default=False,
@@ -52,6 +56,9 @@ def args_handler(argv):
 def _main(argv):
 
     args = args_handler(argv)
+
+    set_db(args.db)
+
     if args.custom:
         environment_name = args.name
         environment_params = {

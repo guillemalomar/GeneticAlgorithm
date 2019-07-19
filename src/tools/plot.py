@@ -25,7 +25,7 @@ class PlotWrapper:
         self.ax6 = self.fig.add_subplot(3, 2, 6)
         plt.xlabel("Iterations")
         plt.tight_layout()
-        plt.gcf().subplots_adjust(bottom=0.1, right=0.9, left=0.1, top=0.9)
+        plt.gcf().subplots_adjust(bottom=0.08, right=0.9, left=0.1, top=0.9)
 
     def add_limits(self, environment):
         self.ax1.axhline(y=environment['predators_speed'], c="red", linewidth=0.5, zorder=0)
