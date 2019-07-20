@@ -53,7 +53,7 @@ Ranges of values
 | Arm reach                          | 2    | 2.5 | m     |
 | Speed                              | 10   | 20  | km/h  |
 | Strength                           | 1    | 10  |       |
-| Skin Thickness                     | 0.05 | 2   | mm    |
+| Skin Thickness                     | 0.05 | 0.3 | mm    |
 | Jump                               | 0    | 0.5 | m     |
 | Height                             | 1    | 1.5 | m     |
 
@@ -72,7 +72,7 @@ An environment is summarized into a reduced set of parameters, which will be key
 | Parameter             | Min | Max | Unit |
 |-----------------------|-----|-----|------|
 | Tree height           | 2.5 | 3   | m    |
-| Temperature           | -5  | 30  | º    |
+| Temperature           | -10 | 50  | º    |
 | Predators speed       | 10  | 20  | km/h |
 | Food animals speed    | 10  | 20  | km/h |
 | Food animals strength | 1   | 10  |      |
