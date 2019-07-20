@@ -35,10 +35,10 @@ ENVIRONMENTS = {
     },
     'Badlands': {
         'tree_height': 2.75,
-        'temperature': 30,
+        'temperature': 40,
         'predators_speed': 20,
         'food_animals_speed': 20,
-        'food_animals_strength': 10
+        'food_animals_strength': 8
     }
 }
 
