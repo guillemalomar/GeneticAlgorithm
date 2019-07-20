@@ -1,3 +1,5 @@
+from src.natural_selection.filter import is_fast_enough, is_warm_enough
+
 
 def analyze_population(current_population, environment):
     total_speed = 0
@@ -13,7 +15,8 @@ def analyze_population(current_population, environment):
         if ((individual['height'] + individual['arm_length'] + individual['jump']) > environment['tree_height'] or
             (individual['speed'] > environment['food_animals_speed'] and
              individual['strength'] > environment['food_animals_strength'])) and \
-           individual['speed'] > environment['predators_speed']:
+                is_fast_enough(individual, environment) and \
+                is_warm_enough(individual, environment):
             total_fitting += 1
     avgs = {
         'avg_speed': total_speed / len(current_population),

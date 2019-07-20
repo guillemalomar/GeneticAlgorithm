@@ -8,7 +8,7 @@ INDIVIDUALS_PARAMS = {
     'speed': [10, 20],
     'strength': [1, 10],
     'jump': [0, 0.5],
-    'skin_thickness': [0.05, 2]
+    'skin_thickness': [0.05, 0.35]
 }
 
 ENVIRONMENTS = {
@@ -20,8 +20,8 @@ ENVIRONMENTS = {
         'food_animals_strength': 5
     },
     'Tundra': {
-        'tree_height': 4,
-        'temperature': -10,
+        'tree_height': 2.75,
+        'temperature': -5,
         'predators_speed': 18,
         'food_animals_speed': 15,
         'food_animals_strength': 7
@@ -34,7 +34,7 @@ ENVIRONMENTS = {
         'food_animals_strength': 8
     },
     'Badlands': {
-        'tree_height': 4,
+        'tree_height': 2.75,
         'temperature': 30,
         'predators_speed': 20,
         'food_animals_speed': 20,

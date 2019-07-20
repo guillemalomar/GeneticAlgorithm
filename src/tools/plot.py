@@ -29,9 +29,11 @@ class PlotWrapper:
         plt.gcf().subplots_adjust(bottom=0.08, right=0.9, left=0.1, top=0.9)
 
     def add_limits(self, environment):
+        temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
         self.ax1.axhline(y=environment['predators_speed'], c="red", linewidth=0.5, zorder=0)
         self.ax1.axhline(y=environment['food_animals_speed'], c="blue", linewidth=0.5, zorder=0)
         self.ax2.axhline(y=environment['food_animals_strength'], c="blue", linewidth=0.5, zorder=0)
+        self.ax3.axhline(y=temp_threshold, c="blue", linewidth=0.5, zorder=0)
         self.ax4.axhline(y=environment['tree_height'], c="blue", linewidth=0.5, zorder=0)
 
         environment_params = '\n'.join(['{}: {}'.format(key, value) for key, value in environment.items()])

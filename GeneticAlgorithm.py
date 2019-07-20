@@ -110,6 +110,6 @@ if __name__ == '__main__':
     try:
         _main(sys.argv)
     except (KeyboardInterrupt, SystemExit):
-        print("Execution cancelled manually")
+        print("\nExecution cancelled manually")
         logging.info("Execution cancelled")
         sys.exit()
