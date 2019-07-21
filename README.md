@@ -155,7 +155,7 @@ The execution results will be stored in the folder _output_. The following is an
 
 ### Testing
 
-Some tests will bee added to the 'tests' folder. To run them, simply type from the main project folder:
+Some tests have been added to the 'tests' folder. To run them, simply type from the main project folder:
 ```
 nosetests tests
 ```
