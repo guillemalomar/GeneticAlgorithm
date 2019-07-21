@@ -91,7 +91,7 @@ The algorithm has 3 main phases:
 
 ![alt text][logo2]
 
-[logo2]: documentation/Architecture.png "Application Structure"
+[logo2]: documentation/Structure.png "Application Structure"
 
 ## Using the application
 
