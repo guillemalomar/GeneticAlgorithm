@@ -1,9 +1,9 @@
 # Genetic Algorithm
 
 *    Title: Genetic Algorithm     
-*    Author: Guillem Nicolau Alomar Sitjes      
-*    Initial release: July 19th, 2019                     
-*    Code version: 0.1                         
+*    Author: Guillem Alomar      
+*    Current release: July 21st, 2019                     
+*    Code version: 1.0                      
 *    Availability: Public     
 
 **Index**
@@ -23,8 +23,11 @@
 - asyncio 3.4.3
 - matplotlib 3.1.1
 - numpy 1.16.4
-- pymongo 3.8.0 (optional)
 - pytest 5.0.1
+
+If you want to use MongoDB as a DB, you will need to also install the following package:
+
+- pymongo 3.8.0
 
 ## Documentation
 
@@ -96,9 +99,10 @@ The algorithm has 3 main phases:
 ## Using the application
 
 ### First of all
+
 - I recommend creating a virtualenv for this project. After creating it, you should run:
 ```
-~/GeneticAlgorithm$ pip install -r requirements.txt
+~/GeneticAlgorithm$ pip install -r requirements.frozen
 ```
 Now all pip packages needed have been installed.
 
