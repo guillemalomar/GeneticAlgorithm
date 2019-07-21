@@ -10,7 +10,7 @@
 * [Requirements](#requirements)
 * [Documentation](#documentation)
     * [Explanation](#explanation)
-    * [Project Structure](#project-structure)
+    * [Application Structure](#application-structure)
 * [Using the application](#using-the-application)
     * [Executing](#executing)
     * [Output](#output)
@@ -85,15 +85,13 @@ The algorithm has 3 main phases:
 
 ![alt text][logo]
 
-[logo]: documentation/Diagram.png "Application Architecture"
+[logo]: documentation/Diagram.png "Genetic Algorithm"
 
-### Project Structure
-
-- Application Architecture
+### Application Structure
 
 ![alt text][logo2]
 
-[logo2]: file_url "Application Architecture"
+[logo2]: documentation/Architecture.png "Application Structure"
 
 ## Using the application
 

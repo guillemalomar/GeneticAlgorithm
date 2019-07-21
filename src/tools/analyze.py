@@ -1,7 +1,8 @@
 from src.natural_selection.filter import is_fast_enough, is_warm_enough
+from src.tools import my_plot
 
 
-def analyze_population(current_population, environment):
+def analyze_population(current_population, environment, iteration):
     total_speed = 0
     total_strength = 0
     total_skin = 0
@@ -25,4 +26,5 @@ def analyze_population(current_population, environment):
         'total_reach': total_reach / len(current_population),
         'fitting': total_fitting
     }
+    my_plot.add_data(avgs, iteration)
     return avgs
