@@ -33,7 +33,7 @@ If you want to use MongoDB as a DB, you will need to also install the following 
 
 ### Explanation
 
-This project is an example of the most classic Genetic Algorithm problem. It will obtain 1 or more environments, will create a set of individuals with random parameters values within a specified range, and will see how these parameters change with the iterations.
+This project is an example of the most classic Genetic Algorithm problem. It will obtain 1 or more environments, will create a set of individuals with random parameters values within a specified range, and will see how these parameters change with the iterations by facing the individuals with each environment.
 
 **Model**
 
@@ -43,22 +43,19 @@ The model is divided in two parts. The population model and the environment mode
 
 Each individual is summarized into a reduced set of parameters, which will be key for his/her future:
 
-- Arm reach: How height can the individual take fruits from trees without jumping.
+- Total reach: How height can the individual take fruits from trees.
 - Speed: How fast can the individual run.
 - Strength: How strong is the individual for fighting.
-- Jump: How height can the individual jump.
-- Skin Thickness: How thick is the individual skin.
+- Skin Thickness: How thick is the individual skin. The ideal thickness is not linearly proportional to the environment temperature. A low temperature will require a thick skin, but a high temperature will require it too.
 
 Ranges of values
 
 | Parameter                          | Min  | Max | Units |
 |------------------------------------|------|-----|-------|
-| Arm reach                          | 2    | 2.5 | m     |
+| Total reach                        | 2.5  | 3   | m     |
 | Speed                              | 10   | 20  | km/h  |
 | Strength                           | 1    | 10  |       |
 | Skin Thickness                     | 0.05 | 0.3 | mm    |
-| Jump                               | 0    | 0.5 | m     |
-| Height                             | 1    | 1.5 | m     |
 
 These are the default ranges, but can be modified in the settings/settings.py file.
 
@@ -168,11 +165,11 @@ nosetests tests
 
 I have chosen these specific parameters because I think they are useful to show how evolution works. The height/jump - tree height for instance was added because I wanted to check how the algorithm modified the individuals during iterations so that the remaining ones could access the environment resources.
 
-I have decided to try to use asyncio not only because I wanted to improve my knowledge on the library, but also because I really needed a good parallel library in order to obtain a good performance in the filtering stage.
-
-I have decided not to use an API for a few reasons. The dataset used by the algorithm is intern, there are no external outputs, so to have an internal API only to encapsulate the processing code wouldn't make much sense. It would complicate the application without any strong reason.
+I have decided to use asyncio not only because I wanted to improve my knowledge on the library, but also because I really needed a good parallel library in order to obtain a good performance in both the filtering stage and the reproducing stage.
 
 I'm using MongoDB because the kind of data that I use fits really well (dictionaries) and with MongoDB Compass I can obtain some valuable information from resulting datasets. It would be interesting to, instead of simply storing and obtaining all individuals in every iteration, reading and writing individuals 1 by 1. This is not needed right now as the set fits in memory, but it could be a need if we want to use much bigger sets.
+
+I have decided not to use an API for a few reasons. The dataset used by the algorithm is intern, there are no external outputs, so to have an internal API only to encapsulate the processing code wouldn't make much sense. It would complicate the application without any strong reason.
 
 ![alt text][logo4]
 
