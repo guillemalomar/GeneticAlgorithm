@@ -44,7 +44,6 @@ def check_converged(analysis1, analysis2):
     total_dif = 0
     for key, val in analysis1.averages.items():
         total_dif += abs(val - analysis2.averages[key])
-    print(total_dif)
     if total_dif < 0.25 and analysis1.averages['fitting'] == initial_population_size:
         return True
     return False
