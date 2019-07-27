@@ -20,7 +20,7 @@ def create_individuals(environment_name):
 
 def obtain_params(index):
     params = {
-        'id': index,
+        '_id': index,
         'age': int(index / 2000) + 1,
         'iteration': 1
     }

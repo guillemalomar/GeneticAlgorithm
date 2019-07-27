@@ -27,7 +27,7 @@ class FilterTests(unittest.TestCase):
             }
             population.append(ind)
         filtered_individuals = filter_individuals(population, environment)
-        self.assertEquals(len(filtered_individuals), 50)
+        self.assertEqual(len(filtered_individuals), 50)
         rand_pos = random.randint(0, 49)
         self.assertGreater(filtered_individuals[rand_pos+1]['strength'],
                            filtered_individuals[rand_pos]['strength'])
@@ -49,7 +49,7 @@ class FilterTests(unittest.TestCase):
             'skin_thickness': 0.05,
             'total_reach': 2
         }
-        self.assertEquals(type(value_function(ind, environment)), float)
+        self.assertEqual(type(value_function(ind, environment)), float)
         self.assertGreaterEqual(value_function(ind, environment), 0)
 
     def test_natural_death(self):
@@ -66,4 +66,4 @@ class FilterTests(unittest.TestCase):
             }
             population.append(ind)
         new_pop = natural_death(0, population)
-        self.assertEquals(len(new_pop), 16)
+        self.assertEqual(len(new_pop), 16)

@@ -37,7 +37,8 @@ class MongoDBWrapper:
 
     def create_collection(self, collection_name, iteration):
         logging.debug("Collection {}{} created".format(collection_name, iteration))
-        self.collections['{}{}'.format(collection_name, iteration)] = self.db['{}{}'.format(collection_name, iteration)]
+        self.collections['{}{}'.format(collection_name, iteration)] = \
+            MongoCollectionWrapper(self.db['{}{}'.format(collection_name, iteration)])
 
     def delete_collection(self, collection_name, iteration):
         logging.debug("Collection {}{} deleted".format(collection_name, iteration))
@@ -52,3 +53,26 @@ class MongoDBWrapper:
 
     def obtain_all_documents(self, collection_name, iteration):
         return self.collections['{}{}'.format(collection_name, iteration)].find({})
+
+
+class MongoCollectionWrapper:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def __setitem__(self, key, value):
+        self.collection[key] = value
+
+    def __getitem__(self, item):
+        return self.collection[item]
+
+    def insert_many(self, documents):
+        self.collection.insert_many(documents)
+
+    def insert_one(self, document):
+        self.collection.insert_one(document)
+
+    def find(self, my_dict):
+        return self.collection.find(my_dict)
+
+    def drop(self):
+        self.collection.drop()
