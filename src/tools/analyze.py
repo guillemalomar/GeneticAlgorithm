@@ -4,7 +4,7 @@ from src.tools import my_plot
 
 
 class PopulationAnalysis:
-    def __init__(self):
+    def __init__(self, environment, iteration):
         self.averages = {
             'avg_speed': 0,
             'avg_strength': 0,
@@ -12,8 +12,10 @@ class PopulationAnalysis:
             'total_reach': 0,
             'fitting': 0
         }
+        self.environment = environment
+        self.iteration = iteration
 
-    def analyze_population(self, current_population, environment, iteration):
+    def analyze_population(self, current_population):
         total_speed = 0
         total_strength = 0
         total_skin = 0
@@ -23,12 +25,13 @@ class PopulationAnalysis:
             total_speed += individual['speed']
             total_strength += individual['strength']
             total_skin += individual['skin_thickness']
-            total_reach += individual['height'] + individual['arm_length'] + individual['jump']
-            if ((individual['height'] + individual['arm_length'] + individual['jump']) > environment['tree_height'] or
-                (individual['speed'] > environment['food_animals_speed'] and
-                 individual['strength'] > environment['food_animals_strength'])) and \
-                    is_fast_enough(individual, environment) and \
-                    is_warm_enough(individual, environment):
+            reach = individual['height'] + individual['arm_length'] + individual['jump']
+            total_reach += reach
+            if (reach > self.environment['tree_height'] or
+                (individual['speed'] > self.environment['food_animals_speed'] and
+                 individual['strength'] > self.environment['food_animals_strength'])) and \
+                    is_fast_enough(individual, self.environment) and \
+                    is_warm_enough(individual, self.environment):
                 total_fitting += 1
         self.averages = {
             'avg_speed': total_speed / len(current_population),
@@ -37,13 +40,13 @@ class PopulationAnalysis:
             'total_reach': total_reach / len(current_population),
             'fitting': total_fitting
         }
-        my_plot.add_data(self.averages, iteration)
+        my_plot.add_data(self.averages, self.iteration)
 
-
-def check_converged(analysis1, analysis2):
-    total_dif = 0
-    for key, val in analysis1.averages.items():
-        total_dif += abs(val - analysis2.averages[key])
-    if total_dif < 0.25 and analysis1.averages['fitting'] == initial_population_size:
-        return True
-    return False
+    def check_converged(self, prev_analysis):
+        if self.averages['fitting'] == initial_population_size:
+            total_dif = 0
+            for key, val in self.averages.items():
+                total_dif += abs(val - prev_analysis.averages[key])
+            if total_dif < 0.25:
+                return True
+        return False
