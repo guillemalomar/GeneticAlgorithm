@@ -2,12 +2,14 @@ import logging
 
 from src.natural_selection.filter import filter_individuals, natural_death
 from src.natural_selection.reproduce import reproduction_stage
-from src.tools.analyze import analyze_population
+from src.tools.analyze import PopulationAnalysis, check_converged
 from src.tools import check_and_return_db
 
 
 def iterate(max_iterations, current_population, environment):
-    
+
+    prev_analysis = PopulationAnalysis()
+
     for iteration in range(1, max_iterations+1):
 
         if iteration % max(int(max_iterations / 10), 10) == 0:
@@ -26,6 +28,11 @@ def iterate(max_iterations, current_population, environment):
 
         current_population = natural_death(iteration, current_population)
 
-        analyze_population(current_population, environment[1], iteration)
+        analysis = PopulationAnalysis()
+        analysis.analyze_population(current_population, environment[1], iteration)
+
+        if check_converged(analysis, prev_analysis):
+            break
+        prev_analysis = analysis
 
     return current_population
