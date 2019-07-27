@@ -36,7 +36,7 @@ async def evaluate_individual(individual, environment):
     :rtype:
     """
     individual_value = value_function(individual, environment)
-    individual_value = check_enough_food(individual, individual_value, environment)
+    individual_value = individual_value * 0.5 if not check_enough_food(individual, environment) else individual_value
     individual_value = check_too_good(individual, individual_value, environment)
     individual_value = check_fast_enough(individual, individual_value, environment)
     individual_value = check_warm_enough(individual, individual_value, environment)
@@ -56,28 +56,33 @@ def value_function(individual, environment):
     temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
     total_value = 0
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
-    total_value += total_reach / environment['tree_height']
-    total_value += individual['speed'] / environment['food_animals_speed']
+    total_value += 4 * total_reach / environment['tree_height']
     total_value += individual['strength'] / environment['food_animals_strength']
+    total_value += individual['speed'] / environment['predators_speed']
     total_value += individual['skin_thickness'] / temp_threshold
     return total_value
 
 
-def check_enough_food(individual, total_value, environment):
+def check_enough_food(individual, environment):
     """
-    This method checks if the individual will be able to obtain food in some way. Otherwise is penalized.
+    This method checks if the individual will be able to obtain food in some way.
     :param individual:
     :type individual: Individual
-    :param total_value:
-    :type total_value: float
     :return:
     :rtype: float
     """
     if (individual['total_reach'] < environment['tree_height']) or \
         (individual['speed'] < environment['food_animals_speed'] and
          individual['strength'] < environment['food_animals_strength']):
-        total_value = total_value * 0.5
-    return total_value
+        return False
+    return True
+
+
+def check_tall_enough(individual, environment):
+    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
+    if total_reach < environment['tree_height']:
+        return False
+    return True
 
 
 def check_too_good(individual, total_value, environment):
@@ -97,19 +102,20 @@ def check_too_good(individual, total_value, environment):
     temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
 
     if individual['total_reach'] / environment['tree_height'] > 1.1:
-        total_value = total_value * 0.50
+        total_value = total_value * 0.7
 
     if individual['skin_thickness'] / temp_threshold > 1.1:
-        total_value = total_value * 0.50
+        total_value = total_value * 0.7
 
-    if ind_speed_vs_food > 1.1:
-        if is_fast_enough(individual, environment):
-            total_value = total_value * 0.70
-        if ind_strength_vs_food > 1.1:
-            total_value = total_value * 0.70
+    if ind_strength_vs_food > 1.1:
+        total_value = total_value * 0.7
+
+    if ind_speed_vs_food > 1.1 and \
+       is_fast_enough(individual, environment):
+        total_value = total_value * 0.7
 
     if ind_speed_vs_predator > 1.1:
-        total_value = total_value * 0.90
+        total_value = total_value * 0.7
 
     return total_value
 
@@ -125,6 +131,12 @@ def is_fast_enough(individual, environment):
     :rtype:
     """
     if individual['speed'] < environment['predators_speed']:
+        return False
+    return True
+
+
+def check_strong_enough(individual, environment):
+    if individual['strength'] < environment['food_animals_strength']:
         return False
     return True
 
@@ -175,7 +187,7 @@ def check_warm_enough(individual, total_value, environment):
     if not is_warm_enough(individual, environment):
         total_value = total_value * 0.1
     else:
-        total_value = total_value * 2
+        total_value = total_value * 1.5
     return total_value
 
 
