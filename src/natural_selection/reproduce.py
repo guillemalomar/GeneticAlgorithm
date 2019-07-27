@@ -26,10 +26,10 @@ def obtain_randomized_pairs_of_individuals(random_individuals, current_populatio
     list_of_pairs = []
     for i in range(0, int(initial_population_size * 0.3)):
         ind1 = current_population[random_individuals.pop()]
-        ind1['id'] = i
+        ind1['_id'] = i
         new_iter_individuals.append(ind1)
         ind2 = current_population[random_individuals.pop()]
-        ind2['id'] = i + int(initial_population_size * 0.3)
+        ind2['_id'] = i + int(initial_population_size * 0.3)
         new_iter_individuals.append(ind2)
         list_of_pairs.append((ind1, ind2))
     return list_of_pairs, new_iter_individuals

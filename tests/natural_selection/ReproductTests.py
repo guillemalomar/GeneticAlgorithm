@@ -13,7 +13,7 @@ class ReproduceTests(unittest.TestCase):
     def test_obtain_randomized_individuals(self):
         num_inds = random.randint(0, 100)
         my_indivs = obtain_randomized_individuals(num_inds)
-        self.assertEquals(len(my_indivs), num_inds)
+        self.assertEqual(len(my_indivs), num_inds)
         for ind1, i in enumerate(my_indivs):
             for ind2, j in enumerate(my_indivs):
                 if ind1 != ind2 and i == j:
