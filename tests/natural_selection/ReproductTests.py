@@ -4,16 +4,15 @@ import unittest
 
 from settings.settings import initial_population_size, INDIVIDUALS_PARAMS, mutation_factor
 from src.natural_selection.reproduce import obtain_children,\
-    obtain_randomized_individuals,\
+    obtain_randomized_pairs,\
     obtain_randomized_pairs_of_individuals
 
 
 class ReproduceTests(unittest.TestCase):
 
     def test_obtain_randomized_individuals(self):
-        num_inds = random.randint(0, 100)
-        my_indivs = obtain_randomized_individuals(num_inds)
-        self.assertEqual(len(my_indivs), num_inds)
+        my_indivs = obtain_randomized_pairs(6000)
+        self.assertEqual(len(my_indivs), 3000)
         for ind1, i in enumerate(my_indivs):
             for ind2, j in enumerate(my_indivs):
                 if ind1 != ind2 and i == j:
@@ -32,12 +31,20 @@ class ReproduceTests(unittest.TestCase):
                 'skin_thickness': 6
             }
             curr_pop.append(indiv)
-        my_indivs = obtain_randomized_individuals(num_inds)
-        my_pairs, new_indivs = obtain_randomized_pairs_of_individuals(my_indivs, curr_pop)
+        my_pairs = obtain_randomized_pairs(num_inds)
+        my_indivs, new_indivs = obtain_randomized_pairs_of_individuals(curr_pop, my_pairs)
+        self.assertEquals(len(my_indivs), 3000)
+        self.assertEquals(len(new_indivs), 6000)
+        self.assertTrue('_id' in new_indivs[0])
         for pair in my_pairs:
             self.assertTrue(len(pair) == 2)
 
     def test_obtain_children(self):
+        _ = asyncio.run(self.async_obtain_children(0, 1))
+
+    async def async_obtain_children(self, indiv1_ind, indiv2_ind):
+        rand_idx = random.randint(0, initial_population_size)
+        rand_iter = random.randint(0, initial_population_size)
 
         indiv1_rand_height = random.uniform(INDIVIDUALS_PARAMS['height'][0],
                                             INDIVIDUALS_PARAMS['height'][1])
@@ -63,7 +70,6 @@ class ReproduceTests(unittest.TestCase):
                                                INDIVIDUALS_PARAMS['skin_thickness'][1])
         indiv2_skin_thickness = random.uniform(INDIVIDUALS_PARAMS['skin_thickness'][0],
                                                INDIVIDUALS_PARAMS['skin_thickness'][1])
-
         indiv1 = {
             'height': indiv1_rand_height,
             'arm_length': indiv1_arm_length,
@@ -81,7 +87,12 @@ class ReproduceTests(unittest.TestCase):
             'jump': indiv2_jump,
             'skin_thickness': indiv2_skin_thickness
         }
-        new_child = asyncio.run(self.async_obtain_children(indiv1, indiv2))
+        current_population = [indiv1, indiv2]
+        new_child = [
+            asyncio.ensure_future(obtain_children(rand_idx, rand_iter, indiv1_ind, indiv2_ind, current_population))
+        ]
+        response = await asyncio.gather(*new_child)
+        new_child = response[0]
         self.assertTrue(new_child['height'] > (indiv1['height'] + indiv2['height']) / 2 -
                         ((indiv1['height'] + indiv2['height']) * mutation_factor))
         self.assertTrue(new_child['height'] < (indiv1['height'] + indiv2['height']) / 2 +
@@ -106,11 +117,4 @@ class ReproduceTests(unittest.TestCase):
                         ((indiv1['skin_thickness'] + indiv2['skin_thickness']) * mutation_factor))
         self.assertTrue(new_child['skin_thickness'] < (indiv1['skin_thickness'] + indiv2['skin_thickness']) / 2 +
                         ((indiv1['skin_thickness'] + indiv2['skin_thickness']) * mutation_factor))
-
-    @staticmethod
-    async def async_obtain_children(indiv1, indiv2):
-        rand_idx = random.randint(0, initial_population_size)
-        rand_iter = random.randint(0, initial_population_size)
-        new_child = [asyncio.ensure_future(obtain_children(rand_idx, rand_iter, indiv1, indiv2))]
-        response = await asyncio.gather(*new_child)
         return response[0]
