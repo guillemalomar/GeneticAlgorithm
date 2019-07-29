@@ -7,15 +7,21 @@ my_plot = PlotWrapper()
 my_mongo_wrapper = None
 
 
-def set_db(activate):
-    from src.tools.mongodb_wrapper import MongoDBWrapper
+def set_db(to_activate):
+    from src.tools.db_wrapper import DBWrapper
     global my_mongo_wrapper
-    if activate:
+    if to_activate:
         logging.debug("MongoDB will be used in this execution")
-        my_mongo_wrapper = MongoDBWrapper()
+        my_mongo_wrapper = DBWrapper()
     else:
-        my_mongo_wrapper = False
+        my_mongo_wrapper = {}
 
 
-def check_and_return_db():
+def check_db():
+    if my_mongo_wrapper:
+        return True
+    return False
+
+
+def return_db():
     return my_mongo_wrapper

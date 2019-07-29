@@ -34,10 +34,10 @@ class PopulationAnalysis:
                     is_warm_enough(individual, self.environment):
                 total_fitting += 1
         self.averages = {
-            'avg_speed': total_speed / len(current_population),
-            'avg_strength': total_strength / len(current_population),
-            'avg_skin': total_skin / len(current_population),
-            'total_reach': total_reach / len(current_population),
+            'avg_speed': total_speed / initial_population_size,
+            'avg_strength': total_strength / initial_population_size,
+            'avg_skin': total_skin / initial_population_size,
+            'total_reach': total_reach / initial_population_size,
             'fitting': total_fitting
         }
         my_plot.add_data(self.averages, self.iteration)
