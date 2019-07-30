@@ -2,7 +2,7 @@
 
 *    Title: Genetic Algorithm     
 *    Author: Guillem Alomar      
-*    Current release: July 21st, 2019                     
+*    Current release: July 30th, 2019                     
 *    Code version: 1.0                      
 *    Availability: Public     
 
