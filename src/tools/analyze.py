@@ -16,6 +16,11 @@ class PopulationAnalysis:
         self.iteration = iteration
 
     def analyze_population(self, current_population):
+        """
+        This method obtains the averages for the current iteration individuals and saves the results to be plot
+    :param current_population: current set of individuals
+    :type current_population: list or DBWrapper
+        """
         total_speed = 0
         total_strength = 0
         total_skin = 0
@@ -43,6 +48,15 @@ class PopulationAnalysis:
         my_plot.add_data(self.averages, self.iteration)
 
     def check_converged(self, prev_analysis):
+        """
+        This method checks if the current iteration individuals have changed much compared to the previous
+        iteration individuals
+        :param prev_analysis: the previous iteration individuals average parameters
+        :type prev_analysis: PopulationAnalysis object
+        :return: true if the current iteration individual parameters are really similar to the previous one. false
+        otherwise
+        :rtype: boolean
+        """
         if self.averages['fitting'] == initial_population_size:
             total_dif = 0
             for key, val in self.averages.items():

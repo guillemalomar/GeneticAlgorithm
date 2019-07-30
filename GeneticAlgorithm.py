@@ -12,7 +12,13 @@ set_logger()
 
 
 def args_handler(argv):
-
+    """
+    Input arguments processor.
+    :param argv: the object containing the input parameters
+    :type argv: argparse object
+    :return: parsed arguments
+    :rtype: a list of the final application input parameters
+    """
     p = argparse.ArgumentParser(
         description='Genetic Algorithm',
         formatter_class=argparse.RawTextHelpFormatter
@@ -61,16 +67,27 @@ def args_handler(argv):
     return p.parse_args(argv[1:])
 
 
-def execute_genetic_algorithm(iterations, environment_name, environment_params):
+def execute_genetic_algorithm(maximum_iterations, environment_name, environment_params):
+    """
+    Main genetic algorithm method
+    :param maximum_iterations: limit number of iterations
+    :type maximum_iterations: int
+    :param environment_name: name of the environment
+    :type environment_name: str
+    :param environment_params: the current parameters against which the individuals will be tested
+    :type environment_params: dict
+    """
     logging.info(20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" +
-                 "Executing with the following parameters:\n" +
-                 "Environment name: {}\n -".format(environment_name) +
-                 "\n -".join(['{}: {}'.format(key, value) for key, value in environment_params.items()]))
+                 33*"#" + " Executing with the following parameters:\n" +
+                 33*"#" + " Environment name: {}\n" + 33*"#" + " -".format(environment_name) +
+                 "\n################################# -".join(
+                     ['{}: {}'.format(key, value) for key, value in environment_params.items()])
+                 )
     my_plot.add_limits(environment_params)
     logging.info("*** Population stage ***")
     initial_population = create_individuals(environment_name)
     logging.info("*** Iteration stage ***")
-    iterate(iterations, initial_population, (environment_name, environment_params))
+    iterate(maximum_iterations, initial_population, (environment_name, environment_params))
     logging.info("*** Closing stage ***")
     my_plot.save_results('{}'.format(environment_name))
 
