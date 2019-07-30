@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from settings.settings import initial_population_size
+from settings.settings import initial_population_size, PARAMETERS_WEIGHTS
 
 
 def filter_individuals(current_population, environment):
@@ -65,10 +65,10 @@ async def evaluate_individual(current_population, individual_id, environment):
     """
     individual = current_population[individual_id]
     individual_value = value_function(individual, environment)
-    individual_value = individual_value * 0.5 if not check_enough_food(individual, environment) else individual_value
+    individual_value = individual_value * 0.5 if not is_food_accessible(individual, environment) else individual_value
     individual_value = check_too_good(individual, individual_value, environment)
-    individual_value = check_fast_enough(individual, individual_value, environment)
-    individual_value = check_warm_enough(individual, individual_value, environment)
+    individual_value = evaluate_fast_enough(individual, individual_value, environment)
+    individual_value = evaluate_warm_enough(individual, individual_value, environment)
     individual['value'] = individual_value
     return individual, individual_value
 
@@ -83,47 +83,15 @@ def value_function(individual, environment):
     :return: evaluation result
     :rtype: float
     """
-    temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
+    skin_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
+    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
+
     total_value = 0
-    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
-    total_value += 4 * total_reach / environment['tree_height']
-    total_value += individual['strength'] / environment['food_animals_strength']
-    total_value += individual['speed'] / environment['predators_speed']
-    total_value += individual['skin_thickness'] / temp_threshold
+    total_value += PARAMETERS_WEIGHTS['total_reach'] * min(total_reach / environment['tree_height'], 1)
+    total_value += PARAMETERS_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
+    total_value += PARAMETERS_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
+    total_value += PARAMETERS_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
     return total_value
-
-
-def check_enough_food(individual, environment):
-    """
-    This method checks if the individual will be able to obtain food in some way.
-    :param individual: current individual parameters
-    :type individual: dict
-    :param environment: the current parameters against which the individuals are being tested
-    :type environment: dict
-    :return: true if the individual has a way of finding food. false otherwise.
-    :rtype: bool
-    """
-    if (individual['total_reach'] < environment['tree_height']) or \
-        (individual['speed'] < environment['food_animals_speed'] and
-         individual['strength'] < environment['food_animals_strength']):
-        return False
-    return True
-
-
-def check_tall_enough(individual, environment):
-    """
-
-    :param individual: current individual parameters
-    :type individual: dict
-    :param environment: the current parameters against which the individuals are being tested
-    :type environment: dict
-    :return: true if the individual can arrive to tree's food. false otherwise.
-    :rtype: bool
-    """
-    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
-    if total_reach < environment['tree_height']:
-        return False
-    return True
 
 
 def check_too_good(individual, total_value, environment):
@@ -139,27 +107,63 @@ def check_too_good(individual, total_value, environment):
     :return: new evaluation for the individual
     :rtype: float
     """
+    skin_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
     ind_speed_vs_predator = individual['speed'] / environment['predators_speed']
     ind_speed_vs_food = individual['speed'] / environment['food_animals_speed']
     ind_strength_vs_food = individual['strength'] / environment['food_animals_strength']
-    temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
+    ind_skin_vs_temp = individual['skin_thickness'] / skin_threshold
+    ind_reach_vs_trees = individual['total_reach'] / environment['tree_height']
 
-    if individual['total_reach'] / environment['tree_height'] > 1.1:
-        total_value = total_value * 0.7
+    if ind_reach_vs_trees > 1.1:
+        total_value = total_value * 0.5
 
-    if individual['skin_thickness'] / temp_threshold > 1.1:
-        total_value = total_value * 0.7
+    if ind_skin_vs_temp > 1.1:
+        total_value = total_value * 0.3
 
     if ind_strength_vs_food > 1.1:
-        total_value = total_value * 0.7
+        total_value = total_value * 0.5
 
     if ind_speed_vs_food > 1.1 and \
-       is_fast_enough(individual, environment):
-        total_value = total_value * 0.7
+       ind_speed_vs_predator >= 1.0:
+        total_value = total_value * 0.5
 
     if ind_speed_vs_predator > 1.1:
-        total_value = total_value * 0.7
+        total_value = total_value * 0.5
 
+    return total_value
+
+
+def evaluate_fast_enough(individual, total_value, environment):
+    """
+    Check if the individual's speed is high enough to scape from predators. Otherwise give a big penalization.
+    :param individual: current individual parameters
+    :type individual: dict
+    :param total_value: current evaluation for the individual
+    :type total_value: float
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: new evaluation for the individual
+    :rtype: float
+    """
+    if not is_fast_enough(individual, environment):
+        total_value = total_value * 0.2
+    return total_value
+
+
+def evaluate_warm_enough(individual, total_value, environment):
+    """
+    Check if the individual's skin is thick enough. Otherwise give a big penalization.
+    :param individual: current individual parameters
+    :type individual: dict
+    :param total_value: current evaluation for the individual
+    :type total_value: float
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: new evaluation for the individual
+    :rtype: float
+    """
+    if not is_warm_enough(individual, environment):
+        total_value = total_value * 0.2
     return total_value
 
 
@@ -178,7 +182,7 @@ def is_fast_enough(individual, environment):
     return True
 
 
-def check_strong_enough(individual, environment):
+def is_strong_enough(individual, environment):
     """
     This method checks if the individual can kill for food
     :param individual: current individual parameters
@@ -191,25 +195,6 @@ def check_strong_enough(individual, environment):
     if individual['strength'] <= environment['food_animals_strength']:
         return False
     return True
-
-
-def check_fast_enough(individual, total_value, environment):
-    """
-    Check if the individual's speed is high enough to scape from predators. Otherwise give a big penalization.
-    :param individual: current individual parameters
-    :type individual: dict
-    :param total_value: current evaluation for the individual
-    :type total_value: float
-    :param environment: the current parameters against which the individuals are being tested
-    :type environment: dict
-    :return: new evaluation for the individual
-    :rtype: float
-    """
-    if not is_fast_enough(individual, environment):
-        total_value = total_value * 0.1
-    else:
-        total_value = total_value * 2
-    return total_value
 
 
 def is_warm_enough(individual, environment):
@@ -228,23 +213,37 @@ def is_warm_enough(individual, environment):
     return True
 
 
-def check_warm_enough(individual, total_value, environment):
+def is_food_accessible(individual, environment):
     """
-    Check if the individual's skin is thick enough. Otherwise give a big penalization.
+    This method checks if the individual will be able to obtain food in some way.
     :param individual: current individual parameters
     :type individual: dict
-    :param total_value: current evaluation for the individual
-    :type total_value: float
     :param environment: the current parameters against which the individuals are being tested
     :type environment: dict
-    :return: new evaluation for the individual
-    :rtype: float
+    :return: true if the individual has a way of finding food. false otherwise.
+    :rtype: bool
     """
-    if not is_warm_enough(individual, environment):
-        total_value = total_value * 0.1
-    else:
-        total_value = total_value * 1.5
-    return total_value
+    if (individual['total_reach'] < environment['tree_height']) or \
+        (individual['speed'] <= environment['food_animals_speed'] and
+         individual['strength'] <= environment['food_animals_strength']):
+        return False
+    return True
+
+
+def is_tall_enough(individual, environment):
+    """
+    This method checks if the individual can reach the food from the trees.
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual can arrive to tree's food. false otherwise.
+    :rtype: bool
+    """
+    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
+    if total_reach < environment['tree_height']:
+        return False
+    return True
 
 
 def natural_death(iteration, current_population):

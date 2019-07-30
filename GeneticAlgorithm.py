@@ -79,11 +79,11 @@ def execute_genetic_algorithm(maximum_iterations, environment_name, environment_
     """
     logging.info(20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" +
                  33*"#" + " Executing with the following parameters:\n" +
-                 33*"#" + " Environment name: {}\n" + 33*"#" + " -".format(environment_name) +
+                 33*"#" + " Environment name: {}\n".format(environment_name) + 33*"#" + " -" +
                  "\n################################# -".join(
                      ['{}: {}'.format(key, value) for key, value in environment_params.items()])
                  )
-    my_plot.add_limits(environment_params)
+    my_plot.add_limits(environment_params, maximum_iterations)
     logging.info("*** Population stage ***")
     initial_population = create_individuals(environment_name)
     logging.info("*** Iteration stage ***")
