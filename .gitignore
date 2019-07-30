@@ -108,3 +108,4 @@ creds.py
 output/*
 !output/ExampleOutput.png
 genetic_algorithm.log
+.DS_Store
