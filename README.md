@@ -1,31 +1,42 @@
 # Genetic Algorithm
 
-*    Title: Genetic Algorithm     
+![alt text][logo5]
+
+[logo5]: documentation/Evolution?style=centerme "Header"
+
 *    Author: Guillem Alomar      
 *    Current release: July 30th, 2019                     
 *    Code version: 1.0                      
-*    Availability: Public     
+*    Availability: Public
 
-**Index**
+## Index
+
 * [Requirements](#requirements)
 * [Documentation](#documentation)
     * [Explanation](#explanation)
+    * [Algorithm](#algorithm)
     * [Application Structure](#application-structure)
 * [Using the application](#using-the-application)
-    * [Executing](#executing)
+    * [First of all](#first-of-all)
+    * [Executing the application](#executing-the-application)
     * [Output](#output)
     * [Testing](#testing)
 * [Decisions taken](#decisions-taken)
 
 ## Requirements
 
+Programming language
+
 - Python +3.7
+
+PIP packages
+
 - asyncio 3.4.3
 - matplotlib 3.1.1
 - numpy 1.16.4
 - pytest 5.0.1
 
-If you want to use MongoDB as a DB, you will need to also install the following package:
+Optional. If you want to use MongoDB, you will also need to install the following PIP package:
 
 - pymongo 3.8.0
 
@@ -77,7 +88,7 @@ An environment is summarized into a reduced set of parameters, which will be key
 
 These min and max values are just a guide, not a fixed wall. But bear in mind that if you use values outside of these ranges the individuals will probably never fit in the environment, or take a lot of iterations to do it.
 
-**Algorithm**
+### Algorithm
 
 The algorithm has 3 main phases:
 
@@ -103,9 +114,7 @@ Now all pip packages needed have been installed.
 
 You will also need to create your own _creds.py_ file. Use the _creds_dummy.py_ file as a layout guide.
 
-### Executing
-
-- Executing the application
+### Executing the application
 
 Now that the server is running, we can execute the application. This is done by typing this:
 ```
