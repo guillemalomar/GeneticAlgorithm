@@ -1,6 +1,6 @@
-max_iterations = 100
+max_iterations = 200
 initial_population_size = 10000
-mutation_factor = 0.02
+mutation_factor = 0.05
 
 INDIVIDUALS_PARAMS = {
     'height': [1, 1.5],
@@ -48,4 +48,11 @@ ENVIRONMENT_DEFAULT = {
     'predators_speed': 10.0,
     'food_animals_speed': 10.0,
     'food_animals_strength': 1.0
+}
+
+PARAMETERS_WEIGHTS = {
+    'speed': 0.225,
+    'strength': 0.225,
+    'total_reach': 0.5,
+    'skin_thickness': 0.05
 }

@@ -57,10 +57,10 @@ class PopulationAnalysis:
         otherwise
         :rtype: boolean
         """
-        if self.averages['fitting'] == initial_population_size:
+        if self.averages['fitting'] >= int(initial_population_size * 0.9):
             total_dif = 0
             for key, val in self.averages.items():
                 total_dif += abs(val - prev_analysis.averages[key])
-            if total_dif < 0.25:
+            if total_dif < 0.35:
                 return True
         return False
