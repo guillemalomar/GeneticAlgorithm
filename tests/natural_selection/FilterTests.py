@@ -2,6 +2,7 @@ import random
 import unittest
 
 from src.natural_selection.filter import filter_individuals, value_function, natural_death
+from settings.settings import initial_population_size
 
 
 class FilterTests(unittest.TestCase):
@@ -15,7 +16,7 @@ class FilterTests(unittest.TestCase):
             'food_animals_strength': 1.0
         }
         population = []
-        for i in range(0, 4050):
+        for i in range(0, initial_population_size + 50):
             ind = {
                 'height': 1,
                 'arm_length': 0,
@@ -27,7 +28,7 @@ class FilterTests(unittest.TestCase):
             }
             population.append(ind)
         filtered_individuals = filter_individuals(population, environment)
-        self.assertEqual(len(filtered_individuals), 50)
+        self.assertEqual(len(filtered_individuals), 6000)
         rand_pos = random.randint(0, 49)
         self.assertGreater(filtered_individuals[rand_pos+1]['strength'],
                            filtered_individuals[rand_pos]['strength'])

@@ -6,13 +6,13 @@ from settings.settings import initial_population_size
 
 def filter_individuals(current_population, environment):
     """
-
-    :param current_population:
-    :type current_population:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    Main filter method
+    :param current_population: set of individuals to test against the environment
+    :type current_population: list or DBWrapper
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: resulting set of individuals after filtering stage
+    :rtype: list or DBWrapper
     """
     if type(current_population) is list:
         valued_individuals = asyncio.run(create_evaluation_tasks(current_population, environment))
@@ -34,6 +34,15 @@ def filter_individuals(current_population, environment):
 
 
 async def create_evaluation_tasks(current_population, environment):
+    """
+    Creates a task for each individual and waits for the result
+    :param current_population: set of individuals to test against the environment
+    :type current_population: list or DBWrapper
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: pairs of individuals with their values
+    :rtype: list of tuples of floats
+    """
     tasks = [
         asyncio.ensure_future(evaluate_individual(current_population, individual_id, environment))
         for individual_id in range(0, initial_population_size)
@@ -45,14 +54,14 @@ async def create_evaluation_tasks(current_population, environment):
 async def evaluate_individual(current_population, individual_id, environment):
     """
     This method obtains an overall value for an individual in an environment
-    :param current_population:
-    :type current_population:
-    :param individual_id:
-    :type individual_id:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    :param current_population: set of individuals to test against the environment
+    :type current_population: list or DBWrapper
+    :param individual_id: id of the individual to evaluate
+    :type individual_id: int
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: pair of individual with its value
+    :rtype: tuple
     """
     individual = current_population[individual_id]
     individual_value = value_function(individual, environment)
@@ -67,12 +76,12 @@ async def evaluate_individual(current_population, individual_id, environment):
 def value_function(individual, environment):
     """
     This method checks how good are the individual parameters
-    :param individual:
-    :type individual:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: evaluation result
+    :rtype: float
     """
     temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
     total_value = 0
@@ -87,12 +96,12 @@ def value_function(individual, environment):
 def check_enough_food(individual, environment):
     """
     This method checks if the individual will be able to obtain food in some way.
-    :param individual:
-    :type individual:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual has a way of finding food. false otherwise.
+    :rtype: bool
     """
     if (individual['total_reach'] < environment['tree_height']) or \
         (individual['speed'] < environment['food_animals_speed'] and
@@ -102,6 +111,15 @@ def check_enough_food(individual, environment):
 
 
 def check_tall_enough(individual, environment):
+    """
+
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual can arrive to tree's food. false otherwise.
+    :rtype: bool
+    """
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
     if total_reach < environment['tree_height']:
         return False
@@ -112,14 +130,14 @@ def check_too_good(individual, total_value, environment):
     """
     This method checks if the individual has some parameter that is too good, and lowers it down (as it's not 'economic'
     to have an overpowered parameter)
-    :param individual:
-    :type individual:
-    :param total_value:
-    :type total_value:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    :param individual: current individual parameters
+    :type individual: dict
+    :param total_value: current evaluation for the individual
+    :type total_value: float
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: new evaluation for the individual
+    :rtype: float
     """
     ind_speed_vs_predator = individual['speed'] / environment['predators_speed']
     ind_speed_vs_food = individual['speed'] / environment['food_animals_speed']
@@ -147,13 +165,13 @@ def check_too_good(individual, total_value, environment):
 
 def is_fast_enough(individual, environment):
     """
-
-    :param individual:
-    :type individual:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    This method checks if the individual can scape from predators
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual is fast enough to scape from its predators. false otherwise.
+    :rtype: bool
     """
     if individual['speed'] < environment['predators_speed']:
         return False
@@ -161,7 +179,16 @@ def is_fast_enough(individual, environment):
 
 
 def check_strong_enough(individual, environment):
-    if individual['strength'] < environment['food_animals_strength']:
+    """
+    This method checks if the individual can kill for food
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual is strong enough to kill food animals. false otherwise.
+    :rtype: bool
+    """
+    if individual['strength'] <= environment['food_animals_strength']:
         return False
     return True
 
@@ -169,14 +196,14 @@ def check_strong_enough(individual, environment):
 def check_fast_enough(individual, total_value, environment):
     """
     Check if the individual's speed is high enough to scape from predators. Otherwise give a big penalization.
-    :param individual:
-    :type individual:
-    :param total_value:
-    :type total_value:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    :param individual: current individual parameters
+    :type individual: dict
+    :param total_value: current evaluation for the individual
+    :type total_value: float
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: new evaluation for the individual
+    :rtype: float
     """
     if not is_fast_enough(individual, environment):
         total_value = total_value * 0.1
@@ -187,13 +214,13 @@ def check_fast_enough(individual, total_value, environment):
 
 def is_warm_enough(individual, environment):
     """
-
-    :param individual:
-    :type individual:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    This method checks if the individual skin is thick enough to survive both low and high temperatures
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual skin fits the environment temperature. false otherwise.
+    :rtype: bool
     """
     temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
     if individual['skin_thickness'] < temp_threshold:
@@ -203,15 +230,15 @@ def is_warm_enough(individual, environment):
 
 def check_warm_enough(individual, total_value, environment):
     """
-    Check if the individual's speed is high enough to scape from predators. Otherwise give a big penalization.
-    :param individual:
-    :type individual:
-    :param total_value:
-    :type total_value:
-    :param environment:
-    :type environment:
-    :return:
-    :rtype:
+    Check if the individual's skin is thick enough. Otherwise give a big penalization.
+    :param individual: current individual parameters
+    :type individual: dict
+    :param total_value: current evaluation for the individual
+    :type total_value: float
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: new evaluation for the individual
+    :rtype: float
     """
     if not is_warm_enough(individual, environment):
         total_value = total_value * 0.1
@@ -222,9 +249,14 @@ def check_warm_enough(individual, total_value, environment):
 
 def natural_death(iteration, current_population):
     """
-    Kill all individuals which have as age the current iteration
-    :return:
-    :rtype: list of Individual
+    Kill all individuals which have as age the current iteration.
+    Also clean old database in case that we are using MongoDB
+    :param iteration: current iteration
+    :type iteration: int
+    :param current_population: Object containing the individuals collections
+    :type current_population: DBWrapper
+    :return: the individuals that survived the filtering stage
+    :rtype: list or DBWrapper
     """
     if type(current_population) is list:
         young_individuals = []

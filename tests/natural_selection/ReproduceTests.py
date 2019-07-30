@@ -32,8 +32,8 @@ class ReproduceTests(unittest.TestCase):
             }
             curr_pop.append(indiv)
         my_pairs = obtain_randomized_pairs(num_inds)
-        my_indivs, new_indivs = obtain_randomized_pairs_of_individuals(curr_pop, my_pairs)
-        self.assertEquals(len(my_indivs), 3000)
+        new_indivs = obtain_randomized_pairs_of_individuals(curr_pop, my_pairs)
+        self.assertEquals(len(my_pairs), 3000)
         self.assertEquals(len(new_indivs), 6000)
         self.assertTrue('_id' in new_indivs[0])
         for pair in my_pairs:

@@ -7,13 +7,24 @@ from settings.settings import mutation_factor, initial_population_size, INDIVIDU
 
 
 def reproduction_stage(iteration, current_population):
+    """
+    This method pairs random individuals, obtains their children, and adds them to the population
+    :param iteration: current iteration
+    :type iteration: int
+    :param current_population: set of individuals to reproduce
+    :type current_population: list or MongoWrapper
+    :return: resulting set of individuals after reproduction stage
+    :rtype: list or DBWrapper
+    """
     random_individuals_pairs = obtain_randomized_pairs(int(initial_population_size * 0.6))
     if type(current_population) is list:
-        list_of_pairs, new_iter_individuals = obtain_randomized_pairs_of_individuals(
+        new_iter_individuals = obtain_randomized_pairs_of_individuals(
             current_population,
             random_individuals_pairs
         )
-        newly_created_individuals = asyncio.run(pair_individuals(current_population, list_of_pairs, iteration))
+        newly_created_individuals = asyncio.run(pair_individuals(current_population,
+                                                                 random_individuals_pairs,
+                                                                 iteration))
         logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
         new_iter_individuals.extend(newly_created_individuals)
         return new_iter_individuals
@@ -26,12 +37,21 @@ def reproduction_stage(iteration, current_population):
                 filtered_population,
                 random_individuals_pairs
         )
-        newly_created_individuals = asyncio.run(pair_individuals(current_population, list_of_pairs, iteration))
+        newly_created_individuals = asyncio.run(pair_individuals(current_population,
+                                                                 list_of_pairs,
+                                                                 iteration))
         logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
         return current_population
 
 
 def obtain_randomized_pairs(current_population_len):
+    """
+    This method obtains a randomized pairs list containing all current individuals
+    :param current_population_len: total number of individuals to randomize
+    :type current_population_len: int
+    :return: the resulting list of randomized pairs
+    :rtype: list of tuples of 2 ints
+    """
     random_individuals = [i for i in range(0, current_population_len)]
     random.shuffle(random_individuals)
     random_pairs = []
@@ -43,8 +63,18 @@ def obtain_randomized_pairs(current_population_len):
 
 
 def mongo_obtain_randomized_pairs_of_individuals(current_population, filtered_population, random_individuals_pairs):
+    """
+    This method inserts the reproduction stage 'parents' into the new collection
+    :param current_population: individuals to reproduce
+    :type current_population: DBWrapper instance
+    :param filtered_population: the specific population to be reproduced
+    :type filtered_population: MongoCollectionWrapper instance
+    :param random_individuals_pairs: list of randomized pairs
+    :type random_individuals_pairs: list of tuples of 2 ints
+    :return: list of randomized pairs
+    :rtype: list of tuples of 2 ints
+    """
     new_iter_individuals = []
-    list_of_pairs = []
     for index, random_individual_pair in enumerate(random_individuals_pairs):
         ind1 = filtered_population[random_individual_pair[0]]
         ind1['_id'] = index
@@ -53,13 +83,20 @@ def mongo_obtain_randomized_pairs_of_individuals(current_population, filtered_po
         ind2 = filtered_population[random_individual_pair[1]]
         ind2['_id'] = index + int(initial_population_size * 0.3)
         current_population.current_collection.insert_one(ind2)
-        list_of_pairs.append((ind1, ind2))
     return random_individuals_pairs
 
 
 def obtain_randomized_pairs_of_individuals(current_population, random_individuals_pairs):
+    """
+    This method inserts the reproduction stage 'parents' into the new collection
+    :param current_population: individuals to reproduce
+    :type current_population: list
+    :param random_individuals_pairs: list of randomized pairs
+    :type random_individuals_pairs: list of tuples of 2 ints
+    :return: parents added to a new list
+    :rtype: list of dicts
+    """
     new_iter_individuals = []
-    list_of_pairs = []
     for index, random_individual_pair in enumerate(random_individuals_pairs):
         ind1 = current_population[random_individual_pair[0]]
         ind1['_id'] = index
@@ -67,11 +104,21 @@ def obtain_randomized_pairs_of_individuals(current_population, random_individual
         ind2 = current_population[random_individual_pair[1]]
         ind2['_id'] = index + int(initial_population_size * 0.3)
         new_iter_individuals.append(ind2)
-        list_of_pairs.append((ind1, ind2))
-    return random_individuals_pairs, new_iter_individuals
+    return new_iter_individuals
 
 
 async def pair_individuals(current_population, list_of_pairs, iteration):
+    """
+    This method creates the asynchronous tasks to obtain two childs for each pair of parents
+    :param current_population: individuals to reproduce
+    :type current_population: list or DBWrapper
+    :param list_of_pairs: list of randomized pairs
+    :type list_of_pairs: list of tuples of 2 ints
+    :param iteration: current iteration
+    :type iteration: int
+    :return: list of the obtained children or list of _id's of the new children
+    :rtype: list of dicts or list of ints
+    """
     tasks = []
     for ind, pair in enumerate(list_of_pairs):
         tasks.append(
@@ -99,6 +146,22 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
 
 
 async def obtain_children(index, iteration, individual1_ind, individual2_ind, current_population):
+    """
+    This method takes the indexes of the new child parents, obtains the parents parameters, and creates the
+    new child parameters from the average of each of the parents parameters, adding a small mutation factor
+    :param index: _id of the new children
+    :type index: int
+    :param iteration: current iteration
+    :type iteration: int
+    :param individual1_ind: parent 1 _id
+    :type individual1_ind: int
+    :param individual2_ind: parent 1 _id
+    :type individual2_ind: int
+    :param current_population: individuals to reproduce
+    :type current_population: list or DBWrapper
+    :return: obtained child or _id of the new child
+    :rtype: dict or int
+    """
     if type(current_population) is list:
         individual1 = current_population[individual1_ind]
         individual2 = current_population[individual2_ind]
@@ -154,4 +217,5 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
     child['total_reach'] = round(child['height'] + child['jump'] + child['arm_length'], 3)
     if type(current_population) is not list:
         current_population.current_collection.insert_one(child)
+        return index
     return child

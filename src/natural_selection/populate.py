@@ -6,6 +6,13 @@ from settings.settings import INDIVIDUALS_PARAMS, initial_population_size
 
 
 def create_individuals(environment_name):
+    """
+    This method creates the initial set of individuals that will be tested against the environment
+    :param environment_name: name of the environment
+    :type environment_name: str
+    :return: resulting set of individuals
+    :rtype: list or DBWrapper
+    """
     current_population = []
     if check_db():
         return_db().create_collection_and_set('{}_{}'.format(environment_name, 1))
@@ -21,10 +28,17 @@ def create_individuals(environment_name):
 
 
 def obtain_params(index):
+    """
+    This method creates an individual for the first iteration, by randomly obtaining values in a defined range for
+    each parameters, and assigning an age and initial iteration
+    :param index: individual index
+    :type index: int
+    :return: the individual containing all its parameters
+    :rtype: dict
+    """
     params = {
         '_id': index,
-        'age': int(index / 2000) + 1,
-        'iteration': 1
+        'age': int(index / 2000) + 1
     }
     for k, v in INDIVIDUALS_PARAMS.items():
         params[k] = round(random.uniform(v[0], v[1]), 3)

@@ -6,7 +6,17 @@ from src.tools.analyze import PopulationAnalysis
 
 
 def iterate(max_iterations, current_population, environment):
-
+    """
+    Main iteration loop.
+    :param max_iterations: maximum number of iterations in case of non-convergence
+    :type max_iterations: int
+    :param current_population: starting set of individuals to test against the environment
+    :type current_population: list or DBWrapper
+    :param environment: the current parameters against which the individuals will be tested
+    :type environment: dict
+    :return: final individuals after reaching max_iterations or converging
+    :rtype: list or DBWrapper
+    """
     iteration = 0
     prev_analysis = PopulationAnalysis(environment[1], iteration)
 
