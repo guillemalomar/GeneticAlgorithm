@@ -48,8 +48,6 @@ Each individual is summarized into a reduced set of parameters, which will be ke
 - Strength: How strong is the individual for fighting.
 - Skin Thickness: How thick is the individual skin. The ideal thickness is not linearly proportional to the environment temperature. A low temperature will require a thick skin, but a high temperature will require it too.
 
-Ranges of values
-
 | Parameter                          | Min  | Max | Units |
 |------------------------------------|------|-----|-------|
 | Total reach                        | 2.5  | 3   | m     |
