@@ -167,7 +167,7 @@ I have chosen these specific parameters because I think they are useful to show 
 
 I have decided to use asyncio not only because I wanted to improve my knowledge on the library, but also because I really needed a good parallel library in order to obtain a good performance in both the filtering stage and the reproducing stage.
 
-I'm using MongoDB because the kind of data that I use fits really well (dictionaries) and with MongoDB Compass I can obtain some valuable information from resulting datasets. It also allows to use much bigger datasets, are it's single read/write, so we don't need to have the full individuals dataset loaded in memory.
+I'm using MongoDB because the kind of data that I use fits really well (dictionaries) and with MongoDB Compass I can obtain some valuable information from resulting datasets. It also allows to use much bigger datasets, as it's single read/write, so we don't need to have the full individuals dataset loaded in memory at any time. Bear in mind that the performance is much worse when this mode is activated.
 
 I have decided not to use an API for a few reasons. The dataset used by the algorithm is intern, there are no external outputs, so to have an internal API only to encapsulate the processing code wouldn't make much sense. It would complicate the application without any strong reason.
 
