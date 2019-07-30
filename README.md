@@ -120,30 +120,31 @@ You can define a custom environment by activating the custom flag, and passing t
 
 ```
 -> % python GeneticAlgorithm.py -h
-usage: GeneticAlgorithm.py [-h] [-i ITERATIONS] [-db] [-c] [-n NAME]
-                           [-th TREE_HEIGHT] [-t TEMPERATURE]
-                           [-ps PREDATORS_SPEED] [-asp FOOD_ANIMALS_SPEED]
-                           [-ast FOOD_ANIMALS_STRENGTH]
+usage: GeneticAlgorithm.py [-h] [-a] [-db] [-c] [-n NAME] [-th TREE_HEIGHT]
+                           [-t TEMPERATURE] [-ps PREDATORS_SPEED]
+                           [-asp FOOD_ANIMALS_SPEED]
+                           [-ast FOOD_ANIMALS_STRENGTH] [-i ITERATIONS]
 
 Genetic Algorithm
 
 optional arguments:
   -h, --help            show this help message and exit
-  -i ITERATIONS, --iterations ITERATIONS
-                        Number of iterations to run.
-  -db, --db             Use MongoDB.
-  -c, --custom          Flag to activate custom mode, to use environment parameters given by the user.
-  -n NAME, --name NAME  Name of the custom execution.
+  -a, --about           (flag) obtain a breve about the application
+  -db, --database       (flag) activate MongoDB
+  -c, --custom          (flag) activate custom mode, to use environment parameters given by the user
+  -n NAME, --name NAME  (text) name of the custom execution
   -th TREE_HEIGHT, --tree_height TREE_HEIGHT
-                        The environment trees height.
+                        (float) the custom environment trees height
   -t TEMPERATURE, --temperature TEMPERATURE
-                        The environment temperature.
+                        (float) the custom environment temperature
   -ps PREDATORS_SPEED, --predators_speed PREDATORS_SPEED
-                        The speed of the environment predators.
+                        (float) the custom environment predators speed
   -asp FOOD_ANIMALS_SPEED, --food_animals_speed FOOD_ANIMALS_SPEED
-                        The speed of the animals that the individuals can hunt.
+                        (float) the custom environment speed of the animals that the individuals can hunt
   -ast FOOD_ANIMALS_STRENGTH, --food_animals_strength FOOD_ANIMALS_STRENGTH
-                        The strength of the animals that the individuals can hunt.
+                        (float) the custom environment strength of the animals that the individuals can hunt
+  -i ITERATIONS, --iterations ITERATIONS
+                        (integer) number of iterations to run
 ```
 
 ### Output
