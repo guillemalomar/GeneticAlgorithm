@@ -2,7 +2,7 @@
 
 ![alt text][logo5]
 
-[logo5]: documentation/Evolution?style=centerme "Header"
+[logo5]: documentation/Evolution.png?style=centerme "Header"
 
 *    Author: Guillem Alomar      
 *    Current release: July 30th, 2019                     
