@@ -1,7 +1,8 @@
 import logging
 
-from src.natural_selection.filter import filter_individuals, natural_death
+from src.natural_selection.filter import filter_individuals, show_best_and_worst_fitting
 from src.natural_selection.reproduce import reproduction_stage
+from src.natural_selection.natural_death import natural_death
 from src.tools.analyze import PopulationAnalysis
 
 
@@ -22,10 +23,13 @@ def iterate(max_iterations, current_population, environment):
 
     for iteration in range(1, max_iterations+1):
 
-        if iteration % max(int(max_iterations / 10), 10) == 0:
+        if iteration % 5 == 0:
             logging.info("Iteration: {}".format(iteration))
 
         current_population = filter_individuals(current_population, environment[1])
+
+        if iteration % 5 == 0:
+            show_best_and_worst_fitting(current_population, iteration)
 
         current_population = reproduction_stage(iteration, current_population)
 
@@ -40,4 +44,5 @@ def iterate(max_iterations, current_population, environment):
         prev_analysis = new_analysis
 
     logging.info("Total number of iterations: {}".format(iteration))
+    print("Total number of iterations: {}".format(iteration))
     return current_population

@@ -61,6 +61,6 @@ class PopulationAnalysis:
             total_dif = 0
             for key, val in self.averages.items():
                 total_dif += abs(val - prev_analysis.averages[key])
-            if total_dif < 0.35:
+            if total_dif < 0.5:
                 return True
         return False

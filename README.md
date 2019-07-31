@@ -156,11 +156,47 @@ optional arguments:
 
 ### Output
 
-The execution results will be stored in the folder _output_. The following is an example of an output:
+When executing, the terminal will show some results similar to these:
+
+```
+#################### NEW EXECUTION ####################
+################################# Executing with the following parameters:
+################################# Environment name: Custom
+################################# -tree_height: 1.0
+################################# -temperature: 0.0
+################################# -predators_speed: 18.5
+################################# -food_animals_speed: 14.0
+################################# -food_animals_strength: 6.0
+Iteration:  5
+Worst individual: {'_id': 4305, 'age': 6, 'height': 1.178, 'speed': 19.004, 'jump': 0.329, 'strength': 4.071, 'arm_length': 0.25, 'skin_thickness': 0.235, 'total_reach': 1.757, 'value': 0.04623312500000001}
+Best individual:  {'_id': 61, 'age': 6, 'height': 1.196, 'speed': 19.943, 'jump': 0.267, 'strength': 6.375, 'arm_length': 0.297, 'skin_thickness': 0.262, 'total_reach': 1.76, 'value': 0.25}
+Iteration:  10
+Worst individual: {'_id': 6530, 'age': 12, 'height': 1.183, 'speed': 17.012, 'jump': 0.23, 'strength': 5.804, 'arm_length': 0.252, 'skin_thickness': 0.262, 'total_reach': 1.665, 'value': 0.09745527027027029}
+Best individual:  {'_id': 24, 'age': 12, 'height': 1.328, 'speed': 18.629, 'jump': 0.208, 'strength': 6.54, 'arm_length': 0.272, 'skin_thickness': 0.255, 'total_reach': 1.808, 'value': 0.25}
+Iteration:  15
+Worst individual: {'_id': 7141, 'age': 17, 'height': 1.263, 'speed': 19.416, 'jump': 0.244, 'strength': 5.608, 'arm_length': 0.254, 'skin_thickness': 0.253, 'total_reach': 1.761, 'value': 0.246325}
+Best individual:  {'_id': 3003, 'age': 18, 'height': 1.277, 'speed': 20.221, 'jump': 0.229, 'strength': 6.01, 'arm_length': 0.228, 'skin_thickness': 0.265, 'total_reach': 1.734, 'value': 0.25}
+Iteration:  20
+Worst individual: {'_id': 6950, 'age': 22, 'height': 1.337, 'speed': 19.504, 'jump': 0.252, 'strength': 6.045, 'arm_length': 0.254, 'skin_thickness': 0.251, 'total_reach': 1.843, 'value': 0.25}
+Best individual:  {'_id': 0, 'age': 22, 'height': 1.218, 'speed': 19.925, 'jump': 0.237, 'strength': 6.037, 'arm_length': 0.249, 'skin_thickness': 0.258, 'total_reach': 1.704, 'value': 0.25}
+Iteration:  25
+Worst individual: {'_id': 10355, 'age': 29, 'height': 1.328, 'speed': 19.976, 'jump': 0.255, 'strength': 6.281, 'arm_length': 0.253, 'skin_thickness': 0.253, 'total_reach': 1.836, 'value': 0.25}
+Best individual:  {'_id': 0, 'age': 26, 'height': 1.253, 'speed': 19.77, 'jump': 0.247, 'strength': 6.362, 'arm_length': 0.247, 'skin_thickness': 0.27, 'total_reach': 1.747, 'value': 0.25}
+Iteration:  30
+Worst individual: {'_id': 7487, 'age': 32, 'height': 1.264, 'speed': 18.728, 'jump': 0.251, 'strength': 6.597, 'arm_length': 0.265, 'skin_thickness': 0.266, 'total_reach': 1.78, 'value': 0.25}
+Best individual:  {'_id': 3002, 'age': 32, 'height': 1.2, 'speed': 18.918, 'jump': 0.242, 'strength': 6.196, 'arm_length': 0.259, 'skin_thickness': 0.264, 'total_reach': 1.701, 'value': 0.25}
+Total number of iterations: 30
+```
+
+Here you can see the worst valued and best valued individuals every 5 iterations.
+
+The average execution results will be stored in the folder _output_. The following is an example of an output:
 
 ![alt text][logo3]
 
 [logo3]: output/ExampleOutput.png "Example output"
+
+You can also find some logs in the file _genetic_algorithm.log_, which will have data from your last execution
 
 ### Testing
 

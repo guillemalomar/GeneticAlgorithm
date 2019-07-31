@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from settings.settings import initial_population_size, PARAMETERS_WEIGHTS
+from settings.settings import initial_population_size, PARAMETER_WEIGHTS
 
 
 def filter_individuals(current_population, environment):
@@ -16,8 +16,8 @@ def filter_individuals(current_population, environment):
     """
     if type(current_population) is list:
         valued_individuals = asyncio.run(create_evaluation_tasks(current_population, environment))
-        valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1])]
-        valued_individuals = valued_individuals[int(initial_population_size * 0.4):]
+        valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1], reverse=True)]
+        valued_individuals = valued_individuals[:int(initial_population_size * 0.6)]
         logging.debug("Deleted {} individuals".format(int(initial_population_size * 0.4)))
         return valued_individuals
     else:
@@ -27,7 +27,7 @@ def filter_individuals(current_population, environment):
             coll[individual[0]['_id']] = individual[0]
         current_population.create_collection_and_set('{}_{}'.format(coll.name, 'filtered'))
         for it_id, item in enumerate(coll.find({},
-                                               sort=[("${}".format("value"), -1)],
+                                               sort=("value", -1),
                                                limit=int(initial_population_size * 0.6))):
             current_population.current_collection[it_id] = item
         return current_population
@@ -87,10 +87,10 @@ def value_function(individual, environment):
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
 
     total_value = 0
-    total_value += PARAMETERS_WEIGHTS['total_reach'] * min(total_reach / environment['tree_height'], 1)
-    total_value += PARAMETERS_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
-    total_value += PARAMETERS_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
-    total_value += PARAMETERS_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
+    total_value += PARAMETER_WEIGHTS['total_reach'] * min(total_reach / environment['tree_height'], 1)
+    total_value += PARAMETER_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
+    total_value += PARAMETER_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
+    total_value += PARAMETER_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
     return total_value
 
 
@@ -246,35 +246,16 @@ def is_tall_enough(individual, environment):
     return True
 
 
-def natural_death(iteration, current_population):
+def show_best_and_worst_fitting(current_population, iteration):
     """
-    Kill all individuals which have as age the current iteration.
-    Also clean old database in case that we are using MongoDB
+    This method prints on terminal the best and worst valued individuals at a specific iteration
+    :param current_population: set of individuals to test against the environment
+    :type current_population: list or DBWrapper
     :param iteration: current iteration
     :type iteration: int
-    :param current_population: Object containing the individuals collections
-    :type current_population: DBWrapper
-    :return: the individuals that survived the filtering stage
-    :rtype: list or DBWrapper
     """
-    if type(current_population) is list:
-        young_individuals = []
-        for individual in current_population:
-            if individual['age'] > iteration:
-                young_individuals.append(individual)
-        young_individuals = young_individuals[0: initial_population_size]
-        logging.debug(
-            "{} individuals died of natural causes".format(int(len(current_population) - len(young_individuals)))
-        )
-        return young_individuals
-    else:
-        reproduced_population = current_population.current_collection
-        new_init_coll = '{}_{}'.format(reproduced_population.name.split('_')[0], iteration + 1)
-        current_population.create_collection_and_set(new_init_coll)
-        for index, individual in enumerate(reproduced_population.find({"age": {"$gt": iteration}})):
-            individual['_id'] = index
-            current_population.current_collection.insert_one(individual)
-
-        current_population.clean_old_collections(reproduced_population.name)
-
-        return current_population
+    print("Iteration:  {}".format(iteration))
+    if type(current_population) is not list:
+        current_population = current_population.current_collection
+    print("Worst individual: {}".format(current_population[int(initial_population_size * 0.6) - 1]))
+    print("Best individual:  {}".format(current_population[0]))

@@ -79,6 +79,16 @@ def show_about():
     print(80 * "#")
 
 
+def execution_message(environment_name, environment_params):
+    msg = 20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" + \
+          33*"#" + " Executing with the following parameters:\n" +\
+          33*"#" + " Environment name: {}\n".format(environment_name) + 33*"#" + " -" +\
+          "\n################################# -".join(
+              ['{}: {}'.format(key, value) for key, value in environment_params.items()])
+    print(msg)
+    logging.info(msg)
+
+
 def check_input(args):
     if not args.custom and \
             (not args.name == "Not defined" or
@@ -117,13 +127,8 @@ def execute_genetic_algorithm(maximum_iterations, environment_name, environment_
     :param environment_params: the current parameters against which the individuals will be tested
     :type environment_params: dict
     """
-    logging.info(20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" +
-                 33*"#" + " Executing with the following parameters:\n" +
-                 33*"#" + " Environment name: {}\n".format(environment_name) + 33*"#" + " -" +
-                 "\n################################# -".join(
-                     ['{}: {}'.format(key, value) for key, value in environment_params.items()])
-                 )
-    my_plot.add_limits(environment_params, maximum_iterations)
+    execution_message(environment_name, environment_params)
+    my_plot.add_limits(environment_params)
     logging.info("*** Population stage ***")
     initial_population = create_individuals(environment_name)
     logging.info("*** Iteration stage ***")
@@ -144,7 +149,7 @@ def _main(argv):
 
     set_defaults(args)
 
-    set_db(args.db)
+    set_db(args.database)
 
     if args.custom:
         environment_name = args.name

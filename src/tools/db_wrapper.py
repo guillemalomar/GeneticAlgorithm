@@ -121,6 +121,7 @@ class MongoCollectionWrapper:
     def __setitem__(self, key, value):
         result = self.collection.replace_one({'_id': key}, value)
         if result.matched_count == 0:
+            value['_id'] = key
             self.collection.insert_one(value)
 
     def __getitem__(self, item):
@@ -141,9 +142,9 @@ class MongoCollectionWrapper:
     def find(self, my_dict=None, sort=None, limit=None):
         if sort:
             if limit:
-                return self.collection.find(my_dict, sort=sort, limit=limit)
+                return self.collection.find(my_dict).sort(sort[0], sort[1]).limit(limit)
             else:
-                return self.collection.find(my_dict, sort=sort)
+                return self.collection.find(my_dict).sort(sort[0], sort[1])
         else:
                 return self.collection.find(my_dict)
 
