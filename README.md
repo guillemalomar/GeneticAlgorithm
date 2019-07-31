@@ -44,7 +44,10 @@ Optional. If you want to use MongoDB, you will also need to install the followin
 
 ### Explanation
 
-This project is an example of the most classic Genetic Algorithm problem. It will obtain 1 or more environments, will create a set of individuals with random parameters values within a specified range, and will see how these parameters change with the iterations by facing the individuals with each environment.
+This project is an example of the most classic Genetic Algorithm problem, the evolution of individuals when faced against an environment. In computer science and operations research, a genetic algorithm (GA) is a metaheuristic inspired by the process of natural selection that belongs to the larger class of evolutionary algorithms (EA). Genetic algorithms are commonly used to generate high-quality solutions to optimization and search problems by relying on bio-inspired operators such as mutation, crossover and selection. John Holland introduced genetic algorithms in 1960 based on the concept of Darwin’s theory of evolution; afterwards, his student David E. Goldberg extended GA in 1989.
+To know more, you can check the [Wikipedia page](https://en.wikipedia.org/wiki/Genetic_algorithm)
+
+This application will obtain 1 or more environments, create a set of individuals with random parameters values within a specified range, and show how these parameters change with the iterations by facing the individuals against each environment.
 
 **Model**
 
@@ -153,6 +156,13 @@ optional arguments:
   -i ITERATIONS, --iterations ITERATIONS
                         (integer) number of iterations to run
 ```
+
+You can also do the following by modifying the _settings/settings.py_ file:
+- change existing environments or create new ones
+- change the weights of the individuals parameters
+- change the default individuals parameter ranges
+- change the mutation factor
+- change the initial population size (I wouldn't recommend changing this yet, as it hasn't been tested with other sizes)
 
 ### Output
 
