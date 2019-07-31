@@ -28,26 +28,19 @@ class PlotWrapper:
         plt.tight_layout()
         plt.gcf().subplots_adjust(bottom=0.08, right=0.9, left=0.1, top=0.9)
 
-    def add_limits(self, environment, maximum_iterations):
+    def add_limits(self, environment):
         """
         This method is used to add some horizontal axis's to the plots to understand better if the results
         make sens.
         :param environment: the current parameters against which the individuals are being tested
         :type environment: dict
-        :param maximum_iterations: max iterations to be used as limit for X Axis
-        :type maximum_iterations: int
         """
         temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
         self.ax1.axhline(y=environment['predators_speed'], c="red", linewidth=0.5, zorder=0)
         self.ax1.axhline(y=environment['food_animals_speed'], c="blue", linewidth=0.5, zorder=0)
-        self.ax1.set_xlim(0, maximum_iterations)
         self.ax2.axhline(y=environment['food_animals_strength'], c="blue", linewidth=0.5, zorder=0)
-        self.ax2.set_xlim(0, maximum_iterations)
         self.ax3.axhline(y=temp_threshold, c="blue", linewidth=0.5, zorder=0)
-        self.ax3.set_xlim(0, maximum_iterations)
         self.ax4.axhline(y=environment['tree_height'], c="blue", linewidth=0.5, zorder=0)
-        self.ax4.set_xlim(0, maximum_iterations)
-        self.ax5.set_xlim(0, maximum_iterations)
 
         environment_params = '\n'.join(['{}: {}'.format(key, value) for key, value in environment.items()])
         self.ax6.text(0.2, 0.5, environment_params, horizontalalignment='left', verticalalignment='center', size=15)

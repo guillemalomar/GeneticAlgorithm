@@ -50,7 +50,7 @@ ENVIRONMENT_DEFAULT = {
     'food_animals_strength': 1.0
 }
 
-PARAMETERS_WEIGHTS = {
+PARAMETER_WEIGHTS = {
     'speed': 0.225,
     'strength': 0.225,
     'total_reach': 0.5,
