@@ -9,7 +9,7 @@ from src.tools import my_plot
 from src.tools.printers import execution_message
 from src.tools.input_parser import args_handler, check_input, set_defaults, fix_undefined, set_globals
 
-from settings.logger import set_logger
+from src.tools.logger import set_logger
 
 set_logger()
 
