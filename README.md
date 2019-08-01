@@ -49,6 +49,8 @@ To know more, you can check the [Wikipedia page](https://en.wikipedia.org/wiki/G
 
 This application will obtain 1 or more environments, create a set of individuals with random parameters values within a specified range, and show how these parameters change with the iterations by facing the individuals against each environment.
 
+It also has the option of defining your own set of values for both the individuals and the environment, and to give weights to each value.
+
 **Model**
 
 The model is divided in two parts. The population model and the environment model.
@@ -126,14 +128,13 @@ Now that the server is running, we can execute the application. This is done by 
 
 #### Input parameters
 
-You can define a custom environment by activating the custom flag, and passing the specific parameters that you want to test:
+You can define a custom environment by activating the custom flag:
 
 ```
 -> % python GeneticAlgorithm.py -h
-usage: GeneticAlgorithm.py [-h] [-a] [-db] [-c] [-n NAME] [-th TREE_HEIGHT]
-                           [-t TEMPERATURE] [-ps PREDATORS_SPEED]
-                           [-asp FOOD_ANIMALS_SPEED]
-                           [-ast FOOD_ANIMALS_STRENGTH] [-i ITERATIONS]
+usage: GeneticAlgorithm.py [-h] [-a] [-db] [-g] [-n NAME] [-p PARAMS] [-m]
+                           [-e] [-pop POPULATION] [-i ITERATIONS]
+                           [-mf MUTATIONFACTOR]
 
 Genetic Algorithm
 
@@ -141,28 +142,37 @@ optional arguments:
   -h, --help            show this help message and exit
   -a, --about           (flag) obtain a breve about the application
   -db, --database       (flag) activate MongoDB
-  -c, --custom          (flag) activate custom mode, to use environment parameters given by the user
-  -n NAME, --name NAME  (text) name of the custom execution
-  -th TREE_HEIGHT, --tree_height TREE_HEIGHT
-                        (float) the custom environment trees height
-  -t TEMPERATURE, --temperature TEMPERATURE
-                        (float) the custom environment temperature
-  -ps PREDATORS_SPEED, --predators_speed PREDATORS_SPEED
-                        (float) the custom environment predators speed
-  -asp FOOD_ANIMALS_SPEED, --food_animals_speed FOOD_ANIMALS_SPEED
-                        (float) the custom environment speed of the animals that the individuals can hunt
-  -ast FOOD_ANIMALS_STRENGTH, --food_animals_strength FOOD_ANIMALS_STRENGTH
-                        (float) the custom environment strength of the animals that the individuals can hunt
+  -g, --generic         (flag) activate generic mode, to use the parameters in the settings/generic_model.py file
+  -n NAME, --name NAME  (text) name of the single execution
+  -p PARAMS, --params PARAMS
+                        (text) comma separated parameters for the single execution
+  -m, --multiple        (flag) activate multiple mode, to execute many environments at once
+  -e, --elitist         (flag) pair individuals with other with a similar fitness value, instead of randomly
+  -pop POPULATION, --population POPULATION
+                        (int) initial population size
   -i ITERATIONS, --iterations ITERATIONS
                         (integer) number of iterations to run
+  -mf MUTATIONFACTOR, --mutationfactor MUTATIONFACTOR
+                        (float) mutation factor
 ```
 
-You can also do the following by modifying the _settings/settings.py_ file:
+You can also do the following by modifying the following files:
+
+_settings/settings.py_:
+- change the default initial population size
+- change the default maximum number of iterations
+- change the default mutation factor
+- change the default elitism
+
+_settings/generic_model.py_:
 - change existing environments or create new ones
 - change the weights of the individuals parameters
 - change the default individuals parameter ranges
-- change the mutation factor
-- change the initial population size (I wouldn't recommend changing this yet, as it hasn't been tested with other sizes)
+
+_settings/human_model.py_:
+- change existing environments or create new ones
+- change the weights of the individuals parameters
+- change the default individuals parameter ranges
 
 ### Output
 
@@ -171,31 +181,35 @@ When executing, the terminal will show some results similar to these:
 ```
 #################### NEW EXECUTION ####################
 ################################# Executing with the following parameters:
-################################# Environment name: Custom
-################################# -tree_height: 1.0
-################################# -temperature: 0.0
-################################# -predators_speed: 18.5
-################################# -food_animals_speed: 14.0
-################################# -food_animals_strength: 6.0
-Iteration:  5
-Worst individual: {'_id': 4305, 'age': 6, 'height': 1.178, 'speed': 19.004, 'jump': 0.329, 'strength': 4.071, 'arm_length': 0.25, 'skin_thickness': 0.235, 'total_reach': 1.757, 'value': 0.04623312500000001}
-Best individual:  {'_id': 61, 'age': 6, 'height': 1.196, 'speed': 19.943, 'jump': 0.267, 'strength': 6.375, 'arm_length': 0.297, 'skin_thickness': 0.262, 'total_reach': 1.76, 'value': 0.25}
-Iteration:  10
-Worst individual: {'_id': 6530, 'age': 12, 'height': 1.183, 'speed': 17.012, 'jump': 0.23, 'strength': 5.804, 'arm_length': 0.252, 'skin_thickness': 0.262, 'total_reach': 1.665, 'value': 0.09745527027027029}
-Best individual:  {'_id': 24, 'age': 12, 'height': 1.328, 'speed': 18.629, 'jump': 0.208, 'strength': 6.54, 'arm_length': 0.272, 'skin_thickness': 0.255, 'total_reach': 1.808, 'value': 0.25}
-Iteration:  15
-Worst individual: {'_id': 7141, 'age': 17, 'height': 1.263, 'speed': 19.416, 'jump': 0.244, 'strength': 5.608, 'arm_length': 0.254, 'skin_thickness': 0.253, 'total_reach': 1.761, 'value': 0.246325}
-Best individual:  {'_id': 3003, 'age': 18, 'height': 1.277, 'speed': 20.221, 'jump': 0.229, 'strength': 6.01, 'arm_length': 0.228, 'skin_thickness': 0.265, 'total_reach': 1.734, 'value': 0.25}
-Iteration:  20
-Worst individual: {'_id': 6950, 'age': 22, 'height': 1.337, 'speed': 19.504, 'jump': 0.252, 'strength': 6.045, 'arm_length': 0.254, 'skin_thickness': 0.251, 'total_reach': 1.843, 'value': 0.25}
-Best individual:  {'_id': 0, 'age': 22, 'height': 1.218, 'speed': 19.925, 'jump': 0.237, 'strength': 6.037, 'arm_length': 0.249, 'skin_thickness': 0.258, 'total_reach': 1.704, 'value': 0.25}
-Iteration:  25
-Worst individual: {'_id': 10355, 'age': 29, 'height': 1.328, 'speed': 19.976, 'jump': 0.255, 'strength': 6.281, 'arm_length': 0.253, 'skin_thickness': 0.253, 'total_reach': 1.836, 'value': 0.25}
-Best individual:  {'_id': 0, 'age': 26, 'height': 1.253, 'speed': 19.77, 'jump': 0.247, 'strength': 6.362, 'arm_length': 0.247, 'skin_thickness': 0.27, 'total_reach': 1.747, 'value': 0.25}
-Iteration:  30
-Worst individual: {'_id': 7487, 'age': 32, 'height': 1.264, 'speed': 18.728, 'jump': 0.251, 'strength': 6.597, 'arm_length': 0.265, 'skin_thickness': 0.266, 'total_reach': 1.78, 'value': 0.25}
-Best individual:  {'_id': 3002, 'age': 32, 'height': 1.2, 'speed': 18.918, 'jump': 0.242, 'strength': 6.196, 'arm_length': 0.259, 'skin_thickness': 0.264, 'total_reach': 1.701, 'value': 0.25}
-Total number of iterations: 30
+################################# Environment name: Generic Execution
+################################# -value1: 3
+################################# -value2: 4
+################################# -value3: 5
+################################# -value4: 6
+################################# -value5: 7
+Worst individual in iteration 5: {'_id': 884, 'age': 7, 'value1': 4.613, 'value2': 4.094, 'value3': 4.4, 'value4': 3.904, 'value5': 4.882, 'value': 0.477702380952381}
+Best individual in iteration 5:  {'_id': 359, 'age': 8, 'value1': 3.014, 'value2': 4.291, 'value3': 5.152, 'value4': 7.018, 'value5': 4.748, 'value': 0.9839142857142857}
+Worst individual in iteration 10: {'_id': 2, 'age': 13, 'value1': 3.296, 'value2': 4.193, 'value3': 3.93, 'value4': 4.739, 'value5': 4.462, 'value': 0.9499630952380953}
+Best individual in iteration 10:  {'_id': 1115, 'age': 14, 'value1': 3.205, 'value2': 4.108, 'value3': 4.95, 'value4': 5.226, 'value5': 5.137, 'value': 0.9792428571428571}
+Worst individual in iteration 15: {'_id': 420, 'age': 16, 'value1': 3.021, 'value2': 4.141, 'value3': 4.581, 'value4': 4.56, 'value5': 5.303, 'value': 0.9674985714285715}
+Best individual in iteration 15:  {'_id': 912, 'age': 17, 'value1': 3.186, 'value2': 4.173, 'value3': 5.024, 'value4': 5.435, 'value5': 4.877, 'value': 0.9801273809523809}
+Worst individual in iteration 20: {'_id': 31, 'age': 23, 'value1': 3.235, 'value2': 4.204, 'value3': 5.241, 'value4': 4.813, 'value5': 4.942, 'value': 0.9754083333333333}
+Best individual in iteration 20:  {'_id': 1140, 'age': 24, 'value1': 3.193, 'value2': 4.273, 'value3': 4.992, 'value4': 5.451, 'value5': 5.264, 'value': 0.9828650000000001}
+Worst individual in iteration 25: {'_id': 571, 'age': 25, 'value1': 3.203, 'value2': 4.276, 'value3': 4.85, 'value4': 5.345, 'value5': 5.441, 'value': 0.9804059523809524}
+Best individual in iteration 25:  {'_id': 763, 'age': 26, 'value1': 3.286, 'value2': 4.392, 'value3': 5.723, 'value4': 5.416, 'value5': 5.633, 'value': 0.9853690476190476}
+Worst individual in iteration 30: {'_id': 475, 'age': 30, 'value1': 3.353, 'value2': 4.301, 'value3': 5.444, 'value4': 5.364, 'value5': 5.631, 'value': 0.9849214285714285}
+Best individual in iteration 30:  {'_id': 1070, 'age': 33, 'value1': 3.368, 'value2': 4.201, 'value3': 5.053, 'value4': 5.978, 'value5': 5.707, 'value': 0.9905809523809523}
+Worst individual in iteration 35: {'_id': 785, 'age': 36, 'value1': 3.207, 'value2': 4.423, 'value3': 5.249, 'value4': 5.784, 'value5': 5.836, 'value': 0.9898857142857144}
+Best individual in iteration 35:  {'_id': 1057, 'age': 38, 'value1': 3.005, 'value2': 4.095, 'value3': 5.595, 'value4': 6.04, 'value5': 6.237, 'value': 0.99455}
+Worst individual in iteration 40: {'_id': 532, 'age': 43, 'value1': 3.396, 'value2': 4.12, 'value3': 5.473, 'value4': 6.075, 'value5': 6.119, 'value': 0.9937071428571429}
+Best individual in iteration 40:  {'_id': 805, 'age': 41, 'value1': 3.199, 'value2': 4.289, 'value3': 5.344, 'value4': 6.251, 'value5': 6.664, 'value': 0.9976}
+Worst individual in iteration 45: {'_id': 421, 'age': 48, 'value1': 3.336, 'value2': 4.263, 'value3': 5.365, 'value4': 6.77, 'value5': 6.65, 'value': 0.9975}
+Best individual in iteration 45:  {'_id': 1090, 'age': 49, 'value1': 3.187, 'value2': 4.077, 'value3': 5.623, 'value4': 6.021, 'value5': 7.064, 'value': 1.0}
+Worst individual in iteration 50: {'_id': 549, 'age': 51, 'value1': 3.115, 'value2': 4.204, 'value3': 5.117, 'value4': 6.123, 'value5': 7.144, 'value': 1.0}
+Best individual in iteration 50:  {'_id': 1080, 'age': 54, 'value1': 3.339, 'value2': 4.255, 'value3': 5.339, 'value4': 6.212, 'value5': 7.291, 'value': 1.0}
+Worst individual in iteration 55: {'_id': 883, 'age': 57, 'value1': 3.18, 'value2': 4.217, 'value3': 5.472, 'value4': 6.019, 'value5': 7.31, 'value': 1.0}
+Best individual in iteration 55:  {'_id': 1080, 'age': 59, 'value1': 3.455, 'value2': 4.324, 'value3': 5.162, 'value4': 6.541, 'value5': 7.019, 'value': 1.0}
+Total number of iterations: 57
 ```
 
 Here you can see the worst valued and best valued individuals every 5 iterations.

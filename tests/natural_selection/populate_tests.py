@@ -14,4 +14,4 @@ class PopulateTests(unittest.TestCase):
         rand_int = random.randint(0, initial_population_size)
         result = obtain_params(rand_int)
         self.assertEqual(result['_id'], rand_int)
-        self.assertEqual(result['age'], int(rand_int / 2000) + 1)
+        self.assertEqual(result['age'], int(rand_int / int(initial_population_size / 5)) + 1)

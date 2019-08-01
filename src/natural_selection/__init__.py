@@ -23,11 +23,7 @@ def iterate(max_iterations, current_population, environment):
 
     for iteration in range(1, max_iterations+1):
 
-        if iteration % 5 == 0:
-            logging.info("Iteration: {}".format(iteration))
-
         current_population = filter_individuals(current_population, environment[1])
-
         if iteration % 5 == 0:
             show_best_and_worst_fitting(current_population, iteration)
 

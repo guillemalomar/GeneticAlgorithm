@@ -1,7 +1,8 @@
 import random
 import unittest
 
-from src.natural_selection.filter import filter_individuals, value_function, natural_death
+from src.natural_selection.filter import filter_individuals, human_value_function
+from src.natural_selection.natural_death import natural_death
 from settings.settings import initial_population_size
 
 
@@ -28,7 +29,7 @@ class FilterTests(unittest.TestCase):
             }
             population.append(ind)
         filtered_individuals = filter_individuals(population, environment)
-        self.assertEqual(len(filtered_individuals), 6000)
+        self.assertEqual(len(filtered_individuals), int(initial_population_size * 0.6))
         rand_pos = random.randint(0, 49)
         self.assertGreater(filtered_individuals[rand_pos+1]['strength'],
                            filtered_individuals[rand_pos]['strength'])
@@ -50,12 +51,12 @@ class FilterTests(unittest.TestCase):
             'skin_thickness': 0.05,
             'total_reach': 2
         }
-        self.assertEqual(type(value_function(ind, environment)), float)
-        self.assertGreaterEqual(value_function(ind, environment), 0)
+        self.assertEqual(type(human_value_function(ind, environment)), float)
+        self.assertGreaterEqual(human_value_function(ind, environment), 0)
 
     def test_natural_death(self):
         population = []
-        for i in range(1, 20):
+        for i in range(0, initial_population_size + 1000):
             ind = {
                 'age': i % 5,
                 'height': 1,
@@ -67,4 +68,4 @@ class FilterTests(unittest.TestCase):
             }
             population.append(ind)
         new_pop = natural_death(0, population)
-        self.assertEqual(len(new_pop), 16)
+        self.assertEqual(len(new_pop), initial_population_size)

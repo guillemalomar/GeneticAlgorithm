@@ -2,17 +2,18 @@ import asyncio
 import random
 import unittest
 
-from settings.settings import initial_population_size, INDIVIDUALS_PARAMS, mutation_factor
+from settings.settings import initial_population_size, mutation_factor
+from settings.human_model import HUMAN_PARAMS
 from src.natural_selection.reproduce import obtain_children,\
     obtain_randomized_pairs,\
-    obtain_randomized_pairs_of_individuals
+    obtain_pairs_of_individuals
 
 
 class ReproduceTests(unittest.TestCase):
 
     def test_obtain_randomized_individuals(self):
-        my_indivs = obtain_randomized_pairs(6000)
-        self.assertEqual(len(my_indivs), 3000)
+        my_indivs = obtain_randomized_pairs(int(initial_population_size * 0.6))
+        self.assertEqual(len(my_indivs), int(initial_population_size * 0.3))
         for ind1, i in enumerate(my_indivs):
             for ind2, j in enumerate(my_indivs):
                 if ind1 != ind2 and i == j:
@@ -32,9 +33,9 @@ class ReproduceTests(unittest.TestCase):
             }
             curr_pop.append(indiv)
         my_pairs = obtain_randomized_pairs(num_inds)
-        new_indivs = obtain_randomized_pairs_of_individuals(curr_pop, my_pairs)
-        self.assertEquals(len(my_pairs), 3000)
-        self.assertEquals(len(new_indivs), 6000)
+        new_indivs = obtain_pairs_of_individuals(curr_pop, my_pairs)
+        self.assertEquals(len(my_pairs), int(initial_population_size * 0.3))
+        self.assertEquals(len(new_indivs), int(initial_population_size * 0.6))
         self.assertTrue('_id' in new_indivs[0])
         for pair in my_pairs:
             self.assertTrue(len(pair) == 2)
@@ -46,30 +47,30 @@ class ReproduceTests(unittest.TestCase):
         rand_idx = random.randint(0, initial_population_size)
         rand_iter = random.randint(0, initial_population_size)
 
-        indiv1_rand_height = random.uniform(INDIVIDUALS_PARAMS['height'][0],
-                                            INDIVIDUALS_PARAMS['height'][1])
-        indiv2_rand_height = random.uniform(INDIVIDUALS_PARAMS['height'][0],
-                                            INDIVIDUALS_PARAMS['height'][1])
-        indiv1_arm_length = random.uniform(INDIVIDUALS_PARAMS['arm_length'][0],
-                                           INDIVIDUALS_PARAMS['arm_length'][1])
-        indiv2_arm_length = random.uniform(INDIVIDUALS_PARAMS['arm_length'][0],
-                                           INDIVIDUALS_PARAMS['arm_length'][1])
-        indiv1_speed = random.uniform(INDIVIDUALS_PARAMS['speed'][0],
-                                      INDIVIDUALS_PARAMS['speed'][1])
-        indiv2_speed = random.uniform(INDIVIDUALS_PARAMS['speed'][0],
-                                      INDIVIDUALS_PARAMS['speed'][1])
-        indiv1_strength = random.uniform(INDIVIDUALS_PARAMS['strength'][0],
-                                         INDIVIDUALS_PARAMS['strength'][1])
-        indiv2_strength = random.uniform(INDIVIDUALS_PARAMS['strength'][0],
-                                         INDIVIDUALS_PARAMS['strength'][1])
-        indiv1_jump = random.uniform(INDIVIDUALS_PARAMS['jump'][0],
-                                     INDIVIDUALS_PARAMS['jump'][1])
-        indiv2_jump = random.uniform(INDIVIDUALS_PARAMS['jump'][0],
-                                     INDIVIDUALS_PARAMS['jump'][1])
-        indiv1_skin_thickness = random.uniform(INDIVIDUALS_PARAMS['skin_thickness'][0],
-                                               INDIVIDUALS_PARAMS['skin_thickness'][1])
-        indiv2_skin_thickness = random.uniform(INDIVIDUALS_PARAMS['skin_thickness'][0],
-                                               INDIVIDUALS_PARAMS['skin_thickness'][1])
+        indiv1_rand_height = random.uniform(HUMAN_PARAMS['height'][0],
+                                            HUMAN_PARAMS['height'][1])
+        indiv2_rand_height = random.uniform(HUMAN_PARAMS['height'][0],
+                                            HUMAN_PARAMS['height'][1])
+        indiv1_arm_length = random.uniform(HUMAN_PARAMS['arm_length'][0],
+                                           HUMAN_PARAMS['arm_length'][1])
+        indiv2_arm_length = random.uniform(HUMAN_PARAMS['arm_length'][0],
+                                           HUMAN_PARAMS['arm_length'][1])
+        indiv1_speed = random.uniform(HUMAN_PARAMS['speed'][0],
+                                      HUMAN_PARAMS['speed'][1])
+        indiv2_speed = random.uniform(HUMAN_PARAMS['speed'][0],
+                                      HUMAN_PARAMS['speed'][1])
+        indiv1_strength = random.uniform(HUMAN_PARAMS['strength'][0],
+                                         HUMAN_PARAMS['strength'][1])
+        indiv2_strength = random.uniform(HUMAN_PARAMS['strength'][0],
+                                         HUMAN_PARAMS['strength'][1])
+        indiv1_jump = random.uniform(HUMAN_PARAMS['jump'][0],
+                                     HUMAN_PARAMS['jump'][1])
+        indiv2_jump = random.uniform(HUMAN_PARAMS['jump'][0],
+                                     HUMAN_PARAMS['jump'][1])
+        indiv1_skin_thickness = random.uniform(HUMAN_PARAMS['skin_thickness'][0],
+                                               HUMAN_PARAMS['skin_thickness'][1])
+        indiv2_skin_thickness = random.uniform(HUMAN_PARAMS['skin_thickness'][0],
+                                               HUMAN_PARAMS['skin_thickness'][1])
         indiv1 = {
             'height': indiv1_rand_height,
             'arm_length': indiv1_arm_length,
