@@ -1,7 +1,9 @@
 import asyncio
 import logging
 
-from settings.settings import initial_population_size, PARAMETER_WEIGHTS
+from settings.human_model import HUMAN_WEIGHTS
+from settings.generic_model import GENERIC_WEIGHTS
+from src import is_generic, get_population_size
 
 
 def filter_individuals(current_population, environment):
@@ -17,8 +19,8 @@ def filter_individuals(current_population, environment):
     if type(current_population) is list:
         valued_individuals = asyncio.run(create_evaluation_tasks(current_population, environment))
         valued_individuals = [y[0] for y in sorted(valued_individuals, key=lambda x: x[1], reverse=True)]
-        valued_individuals = valued_individuals[:int(initial_population_size * 0.6)]
-        logging.debug("Deleted {} individuals".format(int(initial_population_size * 0.4)))
+        valued_individuals = valued_individuals[:int(get_population_size() * 0.6)]
+        logging.debug("Deleted {} individuals".format(int(get_population_size() * 0.4)))
         return valued_individuals
     else:
         coll = current_population.current_collection
@@ -28,7 +30,7 @@ def filter_individuals(current_population, environment):
         current_population.create_collection_and_set('{}_{}'.format(coll.name, 'filtered'))
         for it_id, item in enumerate(coll.find({},
                                                sort=("value", -1),
-                                               limit=int(initial_population_size * 0.6))):
+                                               limit=int(get_population_size() * 0.6))):
             current_population.current_collection[it_id] = item
         return current_population
 
@@ -45,7 +47,7 @@ async def create_evaluation_tasks(current_population, environment):
     """
     tasks = [
         asyncio.ensure_future(evaluate_individual(current_population, individual_id, environment))
-        for individual_id in range(0, initial_population_size)
+        for individual_id in range(0, get_population_size())
     ]
     responses = await asyncio.gather(*tasks)
     return responses
@@ -64,16 +66,44 @@ async def evaluate_individual(current_population, individual_id, environment):
     :rtype: tuple
     """
     individual = current_population[individual_id]
-    individual_value = value_function(individual, environment)
-    individual_value = individual_value * 0.5 if not is_food_accessible(individual, environment) else individual_value
-    individual_value = check_too_good(individual, individual_value, environment)
-    individual_value = evaluate_fast_enough(individual, individual_value, environment)
-    individual_value = evaluate_warm_enough(individual, individual_value, environment)
+    if not is_generic():
+        individual_value = human_value_function(individual, environment)
+        if not is_food_accessible(individual, environment):
+            individual_value = individual_value * 0.5
+        individual_value = human_penalize_extremes(individual, individual_value, environment)
+    else:
+        individual_value = generic_value_function(individual, environment)
+        individual_value = generic_penalize_extremes(individual, individual_value, environment)
     individual['value'] = individual_value
     return individual, individual_value
 
 
-def value_function(individual, environment):
+def generic_value_function(individual, environment):
+    """
+    This method checks how good are the individual parameters
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: evaluation result
+    :rtype: float
+    """
+    total_value = 0
+    for param, value in individual.items():
+        if param != '_id' and param != 'age' and param != 'value':
+            total_value += GENERIC_WEIGHTS[param] * min(value / environment[param], 1)
+    return total_value
+
+
+def generic_penalize_extremes(individual, total_value, environment):
+    for param, value in individual.items():
+        if param != '_id' and param != 'age' and param != 'value':
+            if value / environment[param] > 1.2:
+                total_value = total_value * 0.5
+    return total_value
+
+
+def human_value_function(individual, environment):
     """
     This method checks how good are the individual parameters
     :param individual: current individual parameters
@@ -87,14 +117,14 @@ def value_function(individual, environment):
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
 
     total_value = 0
-    total_value += PARAMETER_WEIGHTS['total_reach'] * min(total_reach / environment['tree_height'], 1)
-    total_value += PARAMETER_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
-    total_value += PARAMETER_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
-    total_value += PARAMETER_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
+    total_value += HUMAN_WEIGHTS['total_reach'] * min(total_reach / environment['tree_height'], 1)
+    total_value += HUMAN_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
+    total_value += HUMAN_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
+    total_value += HUMAN_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
     return total_value
 
 
-def check_too_good(individual, total_value, environment):
+def human_penalize_extremes(individual, total_value, environment):
     """
     This method checks if the individual has some parameter that is too good, and lowers it down (as it's not 'economic'
     to have an overpowered parameter)
@@ -129,6 +159,9 @@ def check_too_good(individual, total_value, environment):
 
     if ind_speed_vs_predator > 1.1:
         total_value = total_value * 0.5
+
+    total_value = evaluate_fast_enough(individual, total_value, environment)
+    total_value = evaluate_warm_enough(individual, total_value, environment)
 
     return total_value
 
@@ -254,8 +287,21 @@ def show_best_and_worst_fitting(current_population, iteration):
     :param iteration: current iteration
     :type iteration: int
     """
-    print("Iteration:  {}".format(iteration))
     if type(current_population) is not list:
         current_population = current_population.current_collection
-    print("Worst individual: {}".format(current_population[int(initial_population_size * 0.6) - 1]))
-    print("Best individual:  {}".format(current_population[0]))
+    print("Worst individual in iteration {}: {}".format(
+        iteration,
+        current_population[int(get_population_size() * 0.6) - 1])
+    )
+    logging.info("Worst individual in iteration {}: {}".format(
+        iteration,
+        current_population[int(get_population_size() * 0.6) - 1])
+    )
+    print("Best individual in iteration {}:  {}".format(
+        iteration,
+        current_population[0])
+    )
+    logging.info("Best individual in iteration {}:  {}".format(
+        iteration,
+        current_population[0])
+    )

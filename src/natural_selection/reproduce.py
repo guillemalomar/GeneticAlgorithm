@@ -3,7 +3,9 @@ import logging
 import numpy as np
 import random
 
-from settings.settings import mutation_factor, initial_population_size, INDIVIDUALS_PARAMS
+from settings.human_model import HUMAN_PARAMS
+from settings.generic_model import GENERIC_PARAMS
+from src import is_generic, is_elitist, get_mutation_factor, get_population_size
 
 
 def reproduction_stage(iteration, current_population):
@@ -16,14 +18,17 @@ def reproduction_stage(iteration, current_population):
     :return: resulting set of individuals after reproduction stage
     :rtype: list or DBWrapper
     """
-    random_individuals_pairs = obtain_randomized_pairs(int(initial_population_size * 0.6))
+    if is_elitist():
+        individuals_pairs = obtain_randomized_pairs(int(get_population_size() * 0.6))
+    else:
+        individuals_pairs = obtain_ordered_pairs(int(get_population_size() * 0.6))
     if type(current_population) is list:
-        new_iter_individuals = obtain_randomized_pairs_of_individuals(
+        new_iter_individuals = obtain_pairs_of_individuals(
             current_population,
-            random_individuals_pairs
+            individuals_pairs
         )
         newly_created_individuals = asyncio.run(pair_individuals(current_population,
-                                                                 random_individuals_pairs,
+                                                                 individuals_pairs,
                                                                  iteration))
         logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
         new_iter_individuals.extend(newly_created_individuals)
@@ -32,10 +37,10 @@ def reproduction_stage(iteration, current_population):
         filtered_population = current_population.current_collection
         reproduction_coll = '{}_{}'.format('_'.join(filtered_population.name.split('_')[0:-1]), 'reproduced')
         current_population.create_collection_and_set(reproduction_coll)
-        list_of_pairs = mongo_obtain_randomized_pairs_of_individuals(
+        list_of_pairs = mongo_obtain_pairs_of_individuals(
                 current_population,
                 filtered_population,
-                random_individuals_pairs
+                individuals_pairs
         )
         newly_created_individuals = asyncio.run(pair_individuals(current_population,
                                                                  list_of_pairs,
@@ -55,54 +60,68 @@ def obtain_randomized_pairs(current_population_len):
     random_individuals = [i for i in range(0, current_population_len)]
     random.shuffle(random_individuals)
     random_pairs = []
-    for i in range(0, int(initial_population_size * 0.3)):
+    for i in range(0, int(get_population_size() * 0.3)):
         ind1 = random_individuals.pop()
         ind2 = random_individuals.pop()
         random_pairs.append((ind1, ind2))
     return random_pairs
 
 
-def mongo_obtain_randomized_pairs_of_individuals(current_population, filtered_population, random_individuals_pairs):
+def obtain_ordered_pairs(current_population_len):
+    """
+    This method obtains an ordered pairs list containing all current individuals
+    :param current_population_len: total number of individuals to randomize
+    :type current_population_len: int
+    :return: the resulting list of ordered pairs
+    :rtype: list of tuples of 2 ints
+    """
+    ordered_pairs = []
+    for i in range(0, current_population_len, 2):
+        ordered_pairs.append((i, i + 1))
+    return ordered_pairs
+
+
+def mongo_obtain_pairs_of_individuals(current_population, filtered_population, individuals_pairs):
     """
     This method inserts the reproduction stage 'parents' into the new collection
     :param current_population: individuals to reproduce
     :type current_population: DBWrapper instance
     :param filtered_population: the specific population to be reproduced
     :type filtered_population: MongoCollectionWrapper instance
-    :param random_individuals_pairs: list of randomized pairs
-    :type random_individuals_pairs: list of tuples of 2 ints
+    :param individuals_pairs: list of pairs
+    :type individuals_pairs: list of tuples of 2 ints
     :return: list of randomized pairs
     :rtype: list of tuples of 2 ints
     """
     new_iter_individuals = []
-    for index, random_individual_pair in enumerate(random_individuals_pairs):
-        ind1 = filtered_population[random_individual_pair[0]]
+    for index, individual_pair in enumerate(individuals_pairs):
+        ind1 = filtered_population[individual_pair[0]]
         ind1['_id'] = index
         current_population.current_collection.insert_one(ind1)
         new_iter_individuals.append(ind1)
-        ind2 = filtered_population[random_individual_pair[1]]
-        ind2['_id'] = index + int(initial_population_size * 0.3)
+        ind2 = filtered_population[individual_pair[1]]
+        ind2['_id'] = index + int(get_population_size() * 0.3)
         current_population.current_collection.insert_one(ind2)
-    return random_individuals_pairs
+    return individuals_pairs
 
 
-def obtain_randomized_pairs_of_individuals(current_population, random_individuals_pairs):
+def obtain_pairs_of_individuals(current_population, individuals_pairs):
     """
     This method inserts the reproduction stage 'parents' into the new collection
     :param current_population: individuals to reproduce
     :type current_population: list
-    :param random_individuals_pairs: list of randomized pairs
-    :type random_individuals_pairs: list of tuples of 2 ints
+    :param individuals_pairs: list of pairs
+    :type individuals_pairs: list of tuples of 2 ints
     :return: parents added to a new list
     :rtype: list of dicts
     """
     new_iter_individuals = []
-    for index, random_individual_pair in enumerate(random_individuals_pairs):
-        ind1 = current_population[random_individual_pair[0]]
+    for index, individual_pair in enumerate(individuals_pairs):
+        ind1 = current_population[individual_pair[0]]
         ind1['_id'] = index
         new_iter_individuals.append(ind1)
-        ind2 = current_population[random_individual_pair[1]]
-        ind2['_id'] = index + int(initial_population_size * 0.3)
+        ind2 = current_population[individual_pair[1]]
+        ind2['_id'] = index + int(get_population_size() * 0.3)
         new_iter_individuals.append(ind2)
     return new_iter_individuals
 
@@ -123,7 +142,7 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
     for ind, pair in enumerate(list_of_pairs):
         tasks.append(
             asyncio.ensure_future(
-                obtain_children(ind + int(initial_population_size * 0.6),
+                obtain_children(ind + int(get_population_size() * 0.6),
                                 iteration,
                                 pair[0],
                                 pair[1],
@@ -133,7 +152,7 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
         )
         tasks.append(
             asyncio.ensure_future(
-                obtain_children(ind + int(initial_population_size * 0.6) + int(initial_population_size * 0.3),
+                obtain_children(ind + int(get_population_size() * 0.6) + int(get_population_size() * 0.3),
                                 iteration,
                                 pair[0],
                                 pair[1],
@@ -163,58 +182,73 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
     :rtype: dict or int
     """
     if type(current_population) is list:
-        individual1 = current_population[individual1_ind]
-        individual2 = current_population[individual2_ind]
+        ind1 = current_population[individual1_ind]
+        ind2 = current_population[individual2_ind]
     else:
-        individual1 = current_population.current_collection[individual1_ind]
-        individual2 = current_population.current_collection[individual2_ind]
+        ind1 = current_population.current_collection[individual1_ind]
+        ind2 = current_population.current_collection[individual2_ind]
     child = dict()
     child['_id'] = index
-    child['age'] = int(index / (initial_population_size / 5)) + iteration
-    child['height'] = round(
-        float(np.clip((individual1['height'] + individual2['height']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                           1 + mutation_factor),
-                      INDIVIDUALS_PARAMS['height'][0] * 0.8,
-                      INDIVIDUALS_PARAMS['height'][1] * 1.2)),
-        3
-    )
-    child['speed'] = round(
-        float(np.clip((individual1['speed'] + individual2['speed']) / 2 * random.uniform(1 - mutation_factor,
+    child['age'] = int((index - int(get_population_size()*0.6)) / int(get_population_size()*0.6 / 5)) \
+        + iteration \
+        + 1
+    mutation_factor = get_mutation_factor()
+    if not is_generic():
+        child['height'] = round(
+            float(np.clip((ind1['height'] + ind2['height']) / 2 * random.uniform(1 - mutation_factor,
+                                                                                 1 + mutation_factor),
+                          HUMAN_PARAMS['height'][0] * 0.8,
+                          HUMAN_PARAMS['height'][1] * 1.2)),
+            3
+        )
+        child['speed'] = round(
+            float(np.clip((ind1['speed'] + ind2['speed']) / 2 * random.uniform(1 - mutation_factor,
+                                                                               1 + mutation_factor),
+                          HUMAN_PARAMS['speed'][0] * 0.8,
+                          HUMAN_PARAMS['speed'][1] * 1.2)),
+            3
+        )
+        child['jump'] = round(
+            float(np.clip((ind1['jump'] + ind2['jump']) / 2 * random.uniform(1 - mutation_factor,
+                                                                             1 + mutation_factor),
+                          HUMAN_PARAMS['jump'][0] * 0.8,
+                          HUMAN_PARAMS['jump'][1] * 1.2)),
+            3
+        )
+        child['strength'] = round(
+            float(np.clip((ind1['strength'] + ind2['strength']) / 2 * random.uniform(1 - mutation_factor,
+                                                                                     1 + mutation_factor),
+                          HUMAN_PARAMS['strength'][0] * 0.8,
+                          HUMAN_PARAMS['strength'][1] * 1.2)),
+            3
+        )
+        child['arm_length'] = round(
+            float(np.clip((ind1['arm_length'] + ind2['arm_length']) / 2 * random.uniform(1 - mutation_factor,
                                                                                          1 + mutation_factor),
-                      INDIVIDUALS_PARAMS['speed'][0] * 0.8,
-                      INDIVIDUALS_PARAMS['speed'][1] * 1.2)),
-        3
-    )
-    child['jump'] = round(
-        float(np.clip((individual1['jump'] + individual2['jump']) / 2 * random.uniform(1 - mutation_factor,
+                          HUMAN_PARAMS['arm_length'][0] * 0.8,
+                          HUMAN_PARAMS['arm_length'][1] * 1.2)),
+            3
+        )
+        child['skin_thickness'] = round(
+            float(np.clip(
+                (ind1['skin_thickness'] + ind2['skin_thickness']) / 2 * random.uniform(1 - mutation_factor,
                                                                                        1 + mutation_factor),
-                      INDIVIDUALS_PARAMS['jump'][0] * 0.8,
-                      INDIVIDUALS_PARAMS['jump'][1] * 1.2)),
-        3
-    )
-    child['strength'] = round(
-        float(np.clip((individual1['strength'] + individual2['strength']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                               1 + mutation_factor),
-                      INDIVIDUALS_PARAMS['strength'][0] * 0.8,
-                      INDIVIDUALS_PARAMS['strength'][1] * 1.2)),
-        3
-    )
-    child['arm_length'] = round(
-        float(np.clip((individual1['arm_length'] + individual2['arm_length']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                                   1 + mutation_factor),
-                      INDIVIDUALS_PARAMS['arm_length'][0] * 0.8,
-                      INDIVIDUALS_PARAMS['arm_length'][1] * 1.2)),
-        3
-    )
-    child['skin_thickness'] = round(
-        float(np.clip(
-            (individual1['skin_thickness'] + individual2['skin_thickness']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                                 1 + mutation_factor),
-            INDIVIDUALS_PARAMS['skin_thickness'][0] * 0.8,
-            INDIVIDUALS_PARAMS['skin_thickness'][1] * 1.2)),
-        3
-    )
-    child['total_reach'] = round(child['height'] + child['jump'] + child['arm_length'], 3)
+                HUMAN_PARAMS['skin_thickness'][0] * 0.8,
+                HUMAN_PARAMS['skin_thickness'][1] * 1.2)),
+            3
+        )
+        child['total_reach'] = round(child['height'] + child['jump'] + child['arm_length'], 3)
+    else:
+        for param, value in ind1.items():
+            if param != '_id' and param != 'age' and param != 'value':
+                child[param] = round(
+                    float(np.clip(
+                        (ind1[param] + ind2[param]) / 2 * random.uniform(1 - mutation_factor,
+                                                                         1 + mutation_factor),
+                        GENERIC_PARAMS[param][0] * 0.8,
+                        GENERIC_PARAMS[param][1] * 1.2)),
+                    3
+                )
     if type(current_population) is not list:
         current_population.current_collection.insert_one(child)
         return index
