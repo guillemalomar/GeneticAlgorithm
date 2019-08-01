@@ -96,26 +96,25 @@ def check_input(args):
         print("The multiple flag has been activated, but a name for a single execution has been given.")
         print("Check your input parameters")
         sys.exit()
-    if args.multiple != "Not defined" and args.params != "Not defined":
+    if args.multiple and args.params != "Not defined":
         print("The multiple flag has been activated, but single parameters have been specified.")
         print("Check your input parameters")
         sys.exit()
     if args.params != "Not defined":
         try:
+            print(args.params)
             exec_params = args.params.split(',')
-            _ = [int(param) for param in exec_params]
+            print(exec_params)
+            args.params = [int(param) for param in exec_params]
         except TypeError:
             print("The format of params is incorrect.")
             sys.exit()
-        for param in exec_params:
-            if type(param) is not int:
-                print("The format of params is incorrect.")
         if args.generic:
-            if len(GENERIC_ENVIRONMENT_DEFAULT.keys()) != len(exec_params):
+            if len(GENERIC_ENVIRONMENT_DEFAULT.keys()) != len(args.params):
                 print("The number of params is incorrect.")
                 sys.exit()
         else:
-            if len(HUMAN_ENVIRONMENT_DEFAULT.keys()) != len(exec_params):
+            if len(HUMAN_ENVIRONMENT_DEFAULT.keys()) != len(args.params):
                 print("The number of params is incorrect.")
                 sys.exit()
     return args
@@ -136,13 +135,12 @@ def set_defaults(args):
     else:
         execution_params = HUMAN_ENVIRONMENT_DEFAULT
     if not args.multiple and args.params != "Not defined":
-        exec_params = args.params.split(',')
         if args.generic:
             for ind, key in enumerate(GENERIC_ENVIRONMENT_DEFAULT.keys()):
-                execution_params[key] = exec_params[ind]
+                execution_params[key] = args.params[ind]
         else:
             for ind, key in enumerate(HUMAN_ENVIRONMENT_DEFAULT.keys()):
-                execution_params[key] = exec_params[ind]
+                execution_params[key] = args.params[ind]
     return execution_params
 
 

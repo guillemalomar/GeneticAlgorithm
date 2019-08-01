@@ -90,9 +90,9 @@ class PlotWrapper:
         :type iteration: int
         """
         if not is_generic():
-            self.ax1.scatter(iteration, results['avg_speed'], color='r', s=3)
-            self.ax2.scatter(iteration, results['avg_strength'], color='g', s=3)
-            self.ax3.scatter(iteration, results['avg_skin'], color='b', s=3)
+            self.ax1.scatter(iteration, results['speed'], color='r', s=3)
+            self.ax2.scatter(iteration, results['strength'], color='g', s=3)
+            self.ax3.scatter(iteration, results['skin'], color='b', s=3)
             self.ax4.scatter(iteration, results['total_reach'], color='c', s=3)
             self.ax5.scatter(iteration, results['fitting'], color='k', s=3)
         else:
