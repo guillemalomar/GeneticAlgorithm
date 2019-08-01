@@ -11,13 +11,15 @@ class PopulationAnalysis:
             for param, _ in GENERIC_PARAMS.items():
                 self.averages[param] = 0
             self.averages['fitting'] = 0
+            self.averages['value'] = 0
         else:
             self.averages = {
-                'avg_speed': 0,
-                'avg_strength': 0,
-                'avg_skin': 0,
+                'speed': 0,
+                'strength': 0,
+                'skin': 0,
                 'total_reach': 0,
-                'fitting': 0
+                'fitting': 0,
+                'value': 0
             }
         self.environment = environment
         self.iteration = iteration
@@ -33,11 +35,16 @@ class PopulationAnalysis:
             total_strength = 0
             total_skin = 0
             total_reach = 0
+            total_value = 0
+            to_evaluate = 0
             total_fitting = 0
             for individual in current_population:
                 total_speed += individual['speed']
                 total_strength += individual['strength']
                 total_skin += individual['skin_thickness']
+                if 'value' in individual:
+                    total_value += individual['value']
+                    to_evaluate += 1
                 reach = individual['height'] + individual['arm_length'] + individual['jump']
                 total_reach += reach
                 if (reach > self.environment['tree_height'] or
@@ -47,24 +54,29 @@ class PopulationAnalysis:
                         is_warm_enough(individual, self.environment):
                     total_fitting += 1
             self.averages = {
-                'avg_speed': total_speed / get_population_size(),
-                'avg_strength': total_strength / get_population_size(),
-                'avg_skin': total_skin / get_population_size(),
+                'speed': total_speed / get_population_size(),
+                'strength': total_strength / get_population_size(),
+                'skin': total_skin / get_population_size(),
                 'total_reach': total_reach / get_population_size(),
+                'value': total_value / to_evaluate,
                 'fitting': total_fitting
             }
         else:
-            total_fitting = 0
+            total_value = 0
+            evaluated = 0
             for individual in current_population:
                 fits = True
                 for param, value in individual.items():
                     if param != '_id' and param != 'age' and param != 'value':
                         self.averages[param] += value
-                        if fits and value < GENERIC_ENVIRONMENT_DEFAULT[param]:
+                        if fits and not (GENERIC_ENVIRONMENT_DEFAULT[param] - 2 < value < GENERIC_ENVIRONMENT_DEFAULT[param] + 2):
                             fits = False
+                    if param == 'value':
+                        total_value += value
+                        evaluated += 1
                 if fits:
-                    total_fitting += 1
-            self.averages['fitting'] = total_fitting
+                    self.averages['fitting'] += 1
+            self.averages['value'] = total_value / max(evaluated, 1)
             for param, value in GENERIC_PARAMS.items():
                 self.averages[param] = self.averages[param] / get_population_size()
         my_plot.add_data(self.averages, self.iteration)
@@ -79,12 +91,13 @@ class PopulationAnalysis:
         otherwise
         :rtype: boolean
         """
-        if self.averages['fitting'] >= int(get_population_size() * 0.85):
-            total_dif = 0
-            for key, val in self.averages.items():
-                total_dif += abs(val - prev_analysis.averages[key])
-            if total_dif < 2:
+        if self.averages['value'] >= 0.7:
+            if self.averages['fitting'] >= int(get_population_size() * 0.80):
+                total_dif = 0
+                for key, val in self.averages.items():
+                    total_dif += abs(val - prev_analysis.averages[key])
+                if total_dif < 1:
+                    return True
+            if self.averages['fitting'] >= int(get_population_size() * 0.95):
                 return True
-        if self.averages['fitting'] >= int(get_population_size() * 0.95):
-            return True
         return False
