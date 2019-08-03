@@ -8,45 +8,36 @@ from settings.generic_model import GENERIC_PARAMS
 from src import is_generic, is_elitist, get_mutation_factor, get_population_size
 
 
-def reproduction_stage(iteration, current_population):
+def reproduction_stage(iteration, current_population, environment_name):
     """
     This method pairs random individuals, obtains their children, and adds them to the population
     :param iteration: current iteration
     :type iteration: int
     :param current_population: set of individuals to reproduce
     :type current_population: list or MongoWrapper
+    :param environment_name:
+    :type environment_name:
     :return: resulting set of individuals after reproduction stage
     :rtype: list or DBWrapper
     """
+    filtered_coll = '{}_{}_filtered'.format(environment_name, iteration)
+    reproduce_coll = '{}_{}_reproduction'.format(environment_name, iteration)
     if is_elitist():
         individuals_pairs = obtain_randomized_pairs(int(get_population_size() * 0.6))
     else:
         individuals_pairs = obtain_ordered_pairs(int(get_population_size() * 0.6))
-    if type(current_population) is list:
-        new_iter_individuals = obtain_pairs_of_individuals(
-            current_population,
-            individuals_pairs
-        )
-        newly_created_individuals = asyncio.run(pair_individuals(current_population,
-                                                                 individuals_pairs,
-                                                                 iteration))
-        logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
-        new_iter_individuals.extend(newly_created_individuals)
-        return new_iter_individuals
-    else:
-        filtered_population = current_population.current_collection
-        reproduction_coll = '{}_{}'.format('_'.join(filtered_population.name.split('_')[0:-1]), 'reproduced')
-        current_population.create_collection_and_set(reproduction_coll)
-        list_of_pairs = mongo_obtain_pairs_of_individuals(
-                current_population,
-                filtered_population,
-                individuals_pairs
-        )
-        newly_created_individuals = asyncio.run(pair_individuals(current_population,
-                                                                 list_of_pairs,
-                                                                 iteration))
-        logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
-        return current_population
+    new_iter_individuals = obtain_pairs_of_individuals(
+        current_population,
+        individuals_pairs,
+        filtered_coll
+    )
+    newly_created_individuals = asyncio.run(pair_individuals(current_population,
+                                                             individuals_pairs,
+                                                             iteration,
+                                                             filtered_coll))
+    logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
+    current_population[reproduce_coll].extend(new_iter_individuals)
+    return current_population
 
 
 def obtain_randomized_pairs(current_population_len):
@@ -105,28 +96,30 @@ def mongo_obtain_pairs_of_individuals(current_population, filtered_population, i
     return individuals_pairs
 
 
-def obtain_pairs_of_individuals(current_population, individuals_pairs):
+def obtain_pairs_of_individuals(current_population, individuals_pairs, filtered_coll):
     """
     This method inserts the reproduction stage 'parents' into the new collection
     :param current_population: individuals to reproduce
     :type current_population: list
     :param individuals_pairs: list of pairs
     :type individuals_pairs: list of tuples of 2 ints
+    :param filtered_coll: name of the filtered collection
+    :type filtered_coll: str
     :return: parents added to a new list
     :rtype: list of dicts
     """
     new_iter_individuals = []
     for index, individual_pair in enumerate(individuals_pairs):
-        ind1 = current_population[individual_pair[0]]
+        ind1 = current_population[filtered_coll][individual_pair[0]]
         ind1['_id'] = index
         new_iter_individuals.append(ind1)
-        ind2 = current_population[individual_pair[1]]
+        ind2 = current_population[filtered_coll][individual_pair[1]]
         ind2['_id'] = index + int(get_population_size() * 0.3)
         new_iter_individuals.append(ind2)
     return new_iter_individuals
 
 
-async def pair_individuals(current_population, list_of_pairs, iteration):
+async def pair_individuals(current_population, list_of_pairs, iteration, filtered_coll):
     """
     This method creates the asynchronous tasks to obtain two childs for each pair of parents
     :param current_population: individuals to reproduce
@@ -135,6 +128,8 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
     :type list_of_pairs: list of tuples of 2 ints
     :param iteration: current iteration
     :type iteration: int
+    :param filtered_coll: name of the filtered collection
+    :type filtered_coll: str
     :return: list of the obtained children or list of _id's of the new children
     :rtype: list of dicts or list of ints
     """
@@ -146,7 +141,8 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
                                 iteration,
                                 pair[0],
                                 pair[1],
-                                current_population
+                                current_population,
+                                filtered_coll
                                 )
             )
         )
@@ -156,7 +152,8 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
                                 iteration,
                                 pair[0],
                                 pair[1],
-                                current_population
+                                current_population,
+                                filtered_coll
                                 )
             )
         )
@@ -164,7 +161,7 @@ async def pair_individuals(current_population, list_of_pairs, iteration):
     return responses
 
 
-async def obtain_children(index, iteration, individual1_ind, individual2_ind, current_population):
+async def obtain_children(index, iteration, individual1_ind, individual2_ind, current_population, filtered_coll):
     """
     This method takes the indexes of the new child parents, obtains the parents parameters, and creates the
     new child parameters from the average of each of the parents parameters, adding a small mutation factor
@@ -178,15 +175,13 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
     :type individual2_ind: int
     :param current_population: individuals to reproduce
     :type current_population: list or DBWrapper
+    :param filtered_coll: name of the filtered collection
+    :type filtered_coll: str
     :return: obtained child or _id of the new child
     :rtype: dict or int
     """
-    if type(current_population) is list:
-        ind1 = current_population[individual1_ind]
-        ind2 = current_population[individual2_ind]
-    else:
-        ind1 = current_population.current_collection[individual1_ind]
-        ind2 = current_population.current_collection[individual2_ind]
+    ind1 = current_population[filtered_coll][individual1_ind]
+    ind2 = current_population[filtered_coll][individual2_ind]
     child = dict()
     child['_id'] = index
     child['age'] = int((index - int(get_population_size()*0.6)) / int(get_population_size()*0.6 / 5)) \
@@ -249,7 +244,6 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
                         GENERIC_PARAMS[param][1] * 1.2)),
                     3
                 )
-    if type(current_population) is not list:
-        current_population.current_collection.insert_one(child)
-        return index
-    return child
+    reproduction_collection = '{}_{}'.format('_'.join(filtered_coll.split('_')[:-1]), 'reproduction')
+    current_population[reproduction_collection].append(child)
+    return index

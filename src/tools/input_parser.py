@@ -1,12 +1,19 @@
 import argparse
 import sys
 
-from settings.generic_model import GENERIC_ENVIRONMENT_DEFAULT
-from settings.human_model import HUMAN_ENVIRONMENT_DEFAULT
+from settings.generic_model import GENERIC_ENVIRONMENT_DEFAULT, GENERIC_ENVIRONMENTS
+from settings.human_model import HUMAN_ENVIRONMENT_DEFAULT, HUMAN_ENVIRONMENTS
 from settings.settings import max_iterations, elitism, mutation_factor, initial_population_size
 from src import set_generic, set_elitist, set_mutation_factor, set_population_size
 from src.tools import set_db
 from src.tools.printers import show_about
+
+
+def process_args(argv):
+    args = args_handler(argv)
+    args = check_input(args)
+    set_globals(args)
+    return args
 
 
 def args_handler(argv):
@@ -26,9 +33,9 @@ def args_handler(argv):
                    default=False,
                    help='(flag) obtain a breve about the application')
 
-    p.add_argument('-db', '--database', action='store_true',
-                   default=False,
-                   help='(flag) activate MongoDB')
+    p.add_argument('-db', '--database', action='store', type=str,
+                   default="Not defined",
+                   help='(string) activate database [mongodb]')
 
     p.add_argument('-g', '--generic', action='store_true',
                    default=False,
@@ -69,20 +76,23 @@ def check_input(args):
     if args.about:
         show_about()
         sys.exit()
+
     if args.multiple and not args.name == "Not defined":
         print("The multiple flag has been activated, but a name for a single execution has been given.")
         print("Check your input parameters")
         sys.exit()
+
     if args.multiple and args.params != "Not defined":
         print("The multiple flag has been activated, but single parameters have been specified.")
         print("Check your input parameters")
         sys.exit()
+
     if args.params != "Not defined":
         try:
             print(args.params)
             exec_params = args.params.split(',')
             print(exec_params)
-            args.params = [int(param) for param in exec_params]
+            args.params = [float(param) for param in exec_params]
         except TypeError:
             print("The format of params is incorrect.")
             sys.exit()
@@ -97,33 +107,40 @@ def check_input(args):
     return args
 
 
-def fix_undefined(args):
-    if not args.multiple and args.name == "Not defined":
-        if args.generic:
-            args.name = "Generic Execution"
-        else:
-            args.name = "Human Execution"
-    return args
-
-
-def set_defaults(args):
-    if args.generic:
-        execution_params = GENERIC_ENVIRONMENT_DEFAULT
-    else:
-        execution_params = HUMAN_ENVIRONMENT_DEFAULT
-    if not args.multiple and args.params != "Not defined":
-        if args.generic:
-            for ind, key in enumerate(GENERIC_ENVIRONMENT_DEFAULT.keys()):
-                execution_params[key] = args.params[ind]
-        else:
-            for ind, key in enumerate(HUMAN_ENVIRONMENT_DEFAULT.keys()):
-                execution_params[key] = args.params[ind]
-    return execution_params
-
-
 def set_globals(args):
     set_db(args.database)
     set_generic(args.generic)
     set_elitist(args.elitist)
     set_mutation_factor(args.mutationfactor)
     set_population_size(args.population)
+
+
+def obtain_environments(args):
+    if args.multiple:
+        if args.generic:
+            to_process = GENERIC_ENVIRONMENTS
+        else:
+            to_process = HUMAN_ENVIRONMENTS
+    else:
+        if args.name == "Not defined":
+            if args.generic:
+                args.name = "GenericExecution"
+            else:
+                args.name = "HumanExecution"
+
+        if args.generic:
+            execution_params = GENERIC_ENVIRONMENT_DEFAULT
+        else:
+            execution_params = HUMAN_ENVIRONMENT_DEFAULT
+
+        if args.params != "Not defined":
+            if args.generic:
+                for ind, key in enumerate(GENERIC_ENVIRONMENT_DEFAULT.keys()):
+                    execution_params[key] = float(args.params[ind])
+            else:
+                for ind, key in enumerate(HUMAN_ENVIRONMENT_DEFAULT.keys()):
+                    execution_params[key] = float(args.params[ind])
+
+        to_process = {args.name: execution_params}
+
+    return to_process

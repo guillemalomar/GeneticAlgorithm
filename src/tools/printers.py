@@ -11,11 +11,11 @@ def show_about():
     print(80 * "#")
 
 
-def execution_message(environment_name, environment_params):
+def execution_message(environment):
     msg = 20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" + \
           33*"#" + " Executing with the following parameters:\n" +\
-          33*"#" + " Environment name: {}\n".format(environment_name) + 33*"#" + " -" +\
+          33*"#" + " Environment name: {}\n".format(environment.name) + 33*"#" + " -" +\
           "\n################################# -".join(
-              ['{}: {}'.format(key, value) for key, value in environment_params.items()])
+              ['{}: {}'.format(key, value) for key, value in environment.data.items()])
     print(msg)
     logging.info(msg)
