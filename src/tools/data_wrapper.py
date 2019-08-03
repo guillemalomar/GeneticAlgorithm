@@ -1,6 +1,7 @@
 import sys
 
-from src.tools.mongo_wrapper import MongoWrapper
+from src.tools.database.mongo_wrapper import MongoWrapper
+from src.tools.database.sql_wrapper import SqlWrapper
 
 
 class DataWrapper:
@@ -8,7 +9,7 @@ class DataWrapper:
         if db.lower() == 'mongodb':
             self.my_data = MongoWrapper()
         elif db.lower() == 'mysql':
-            print("Use of MySQL is not available (yet :P)")
+            self.my_data = SqlWrapper()
             sys.exit()
         else:
             self.my_data = {}
