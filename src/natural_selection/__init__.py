@@ -5,6 +5,8 @@ from src.natural_selection.reproduce import reproduction_stage
 from src.natural_selection.natural_death import natural_death
 from src.tools.analyze import PopulationAnalysis
 
+iteration = 0
+
 
 def iterate(max_iterations, current_population, environment):
     """
@@ -14,25 +16,33 @@ def iterate(max_iterations, current_population, environment):
     :param current_population: starting set of individuals to test against the environment
     :type current_population: list or DBWrapper
     :param environment: the current parameters against which the individuals will be tested
-    :type environment: dict
+    :type environment: Environment
     :return: final individuals after reaching max_iterations or converging
     :rtype: list or DBWrapper
     """
-    iteration = 0
-    prev_analysis = PopulationAnalysis(environment[1], iteration)
+    global iteration
+    prev_analysis = PopulationAnalysis(environment.data, iteration)
 
-    for iteration in range(1, max_iterations+1):
+    while True:
+        iteration += 1
 
-        current_population = filter_individuals(current_population, environment[1])
+        if iteration >= max_iterations:
+            break
+
+        current_population = filter_individuals(current_population, environment, iteration)
         if iteration % 5 == 0:
-            show_best_and_worst_fitting(current_population, iteration)
+            show_best_and_worst_fitting(current_population, environment.name, iteration)
 
-        current_population = reproduction_stage(iteration, current_population)
+        current_population = reproduction_stage(iteration, current_population, environment.name)
 
-        current_population = natural_death(iteration, current_population)
+        current_population = natural_death(iteration, current_population, environment.name)
 
-        new_analysis = PopulationAnalysis(environment[1], iteration)
-        new_analysis.analyze_population(current_population)
+        del current_population['{}_{}'.format(environment.name, iteration)]
+        del current_population['{}_{}_filtered'.format(environment.name, iteration)]
+        del current_population['{}_{}_reproduction'.format(environment.name, iteration)]
+
+        new_analysis = PopulationAnalysis(environment.data, iteration)
+        new_analysis.analyze_population(current_population, environment.name, iteration)
 
         if new_analysis.check_converged(prev_analysis):
             logging.info("Converged")
@@ -41,4 +51,5 @@ def iterate(max_iterations, current_population, environment):
 
     logging.info("Total number of iterations: {}".format(iteration))
     print("Total number of iterations: {}".format(iteration))
+    iteration = 0
     return current_population

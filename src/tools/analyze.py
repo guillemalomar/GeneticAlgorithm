@@ -24,12 +24,17 @@ class PopulationAnalysis:
         self.environment = environment
         self.iteration = iteration
 
-    def analyze_population(self, current_population):
+    def analyze_population(self, current_population, environment_name, iteration):
         """
         This method obtains the averages for the current iteration individuals and saves the results to be plot
         :param current_population: current set of individuals
         :type current_population: list or DBWrapper
+        :param environment_name: the current parameters against which the individuals are being tested
+        :type environment_name: str
+        :param iteration: current iteration
+        :type iteration: int
         """
+        coll_name = '{}_{}'.format(environment_name, iteration + 1)
         if not is_generic():
             total_speed = 0
             total_strength = 0
@@ -38,7 +43,7 @@ class PopulationAnalysis:
             total_value = 0
             to_evaluate = 0
             total_fitting = 0
-            for individual in current_population:
+            for individual in current_population[coll_name]:
                 total_speed += individual['speed']
                 total_strength += individual['strength']
                 total_skin += individual['skin_thickness']
@@ -64,12 +69,13 @@ class PopulationAnalysis:
         else:
             total_value = 0
             evaluated = 0
-            for individual in current_population:
+            for individual in current_population[coll_name]:
                 fits = True
                 for param, value in individual.items():
                     if param != '_id' and param != 'age' and param != 'value':
                         self.averages[param] += value
-                        if fits and not (GENERIC_ENVIRONMENT_DEFAULT[param] - 2 < value < GENERIC_ENVIRONMENT_DEFAULT[param] + 2):
+                        if fits and \
+                           not (GENERIC_ENVIRONMENT_DEFAULT[param]-2 < value < GENERIC_ENVIRONMENT_DEFAULT[param]+2):
                             fits = False
                     if param == 'value':
                         total_value += value

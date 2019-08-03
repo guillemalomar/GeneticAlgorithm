@@ -1,7 +1,7 @@
 generic_execution = False
 elitist_order = False
 mutation_factor = 0
-initial_population_size = 0
+initial_population_size = 100
 
 
 def set_generic(to_activate):

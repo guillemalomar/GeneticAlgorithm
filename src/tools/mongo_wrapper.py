@@ -6,9 +6,9 @@ from pymongo import MongoClient
 from creds import MONGODB_PARAMS
 
 
-class DBWrapper:
+class MongoWrapper:
     """
-    Wrapper for MongoDB
+    Wrapper for Mongo Database
     """
     def __init__(self):
         """
@@ -31,7 +31,6 @@ class DBWrapper:
         self.db = None
         self.collections = {}
         self.check_database()
-        self.current_collection = None
 
     def check_database(self):
         """
@@ -62,22 +61,9 @@ class DBWrapper:
             MongoCollectionWrapper('{}'.format(collection_name),
                                    self.db['{}'.format(collection_name)])
 
-    def set_current_collection(self, collection_name):
-        self.current_collection = MongoCollectionWrapper('{}'.format(collection_name),
-                                                         self.db['{}'.format(collection_name)])
-
-    def create_collection_and_set(self, collection_name):
-        logging.debug("Collection {} created".format(collection_name))
-        self.collections['{}'.format(collection_name)] = \
-            MongoCollectionWrapper('{}'.format(collection_name),
-                                   self.db['{}'.format(collection_name)])
-        self.current_collection = MongoCollectionWrapper('{}'.format(collection_name),
-                                                         self.db['{}'.format(collection_name)])
-
     def delete_collection(self, collection_name):
         logging.debug("Collection {} deleted".format(collection_name))
-        my_col = self.collections['{}'.format(collection_name)]
-        my_col.drop()
+        self.collections['{}'.format(collection_name)].drop()
 
     def insert_document(self, collection_name, document):
         self.collections['{}'.format(collection_name)].insert_one(document)
@@ -88,26 +74,22 @@ class DBWrapper:
     def obtain_all_documents(self, collection_name):
         return self.collections['{}'.format(collection_name)].find({})
 
-    def clean_old_collections(self, base_collection_name):
-        """
-        Deletes the collections used in the previous iteration
-        :param base_collection_name: name of collection in the previous iteration
-        :type base_collection_name: str
-        :return:
-        :rtype:
-        """
-        self.delete_collection(
-            '{}'.format('_'.join(base_collection_name.split('_')[:-1]))
-        )
-        self.delete_collection(
-            '{}_{}'.format('_'.join(base_collection_name.split('_')[:-1]), 'filtered')
-        )
-        self.delete_collection(
-            base_collection_name
-        )
+    def __setitem__(self, key, value):
+        if key not in self.collections:
+            self.create_collection(key)
+        self.collections[key].insert_one(value)
 
-    def __iter__(self):
-        return self.current_collection.__iter__()
+    def __getitem__(self, collection_name):
+        if collection_name not in self.collections:
+            self.collections[collection_name] = MongoCollectionWrapper(
+                collection_name,
+                self.db['{}'.format(collection_name)]
+            )
+        return self.collections[collection_name]
+
+    def __delitem__(self, key):
+        self.delete_collection(key)
+        del self.collections[key]
 
 
 class MongoCollectionWrapper:
@@ -119,16 +101,40 @@ class MongoCollectionWrapper:
         self.collection = collection
 
     def __setitem__(self, key, value):
+        self.collection.delete_one({'_id': key})
         result = self.collection.replace_one({'_id': key}, value)
         if result.matched_count == 0:
             value['_id'] = key
             self.collection.insert_one(value)
 
     def __getitem__(self, item):
-        return self.collection.find_one({'_id': item})
+        if not isinstance(item, slice):
+            return self.collection.find_one({'_id': item})
+        else:
+            return self.collection.find({})
 
-    def sort(self, field, order):
-        return self.collection.sort(field, order)
+    def remove(self, key):
+        self.collection.delete_one({'_id': key})
+
+    def pop(self, key=None):
+        if key:
+            self.collection.delete_one({'_id': key})
+
+    def append(self, item):
+        self.collection.insert_one(item)
+
+    def extend(self, item):
+        self.collection.insert_many(item)
+
+    def sort(self, key, reverse):
+        # return self.collection.sort(key, reverse)
+        to_sort = str(key).split('\'')[1]
+        if reverse:
+            reverse = -1
+        else:
+            reverse = 1
+        for idx, item in enumerate(self.collection.find({}).sort(to_sort, reverse)):
+            self[idx] = item
 
     def limit(self, max_to_return):
         return self.collection.limit(max_to_return)

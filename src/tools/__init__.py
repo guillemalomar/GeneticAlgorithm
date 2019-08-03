@@ -1,27 +1,24 @@
-import logging
-
 from src.tools.plot import PlotWrapper
 
 
 my_plot = PlotWrapper()
-my_mongo_wrapper = None
+my_data_wrapper = {}
 
 
-def set_db(to_activate):
-    from src.tools.db_wrapper import DBWrapper
-    global my_mongo_wrapper
+def set_db(to_activate=None):
+    from src.tools.data_wrapper import DataWrapper
+    global my_data_wrapper
     if to_activate:
-        logging.debug("MongoDB will be used in this execution")
-        my_mongo_wrapper = DBWrapper()
+        my_data_wrapper = DataWrapper(to_activate)
     else:
-        my_mongo_wrapper = {}
+        my_data_wrapper = DataWrapper()
 
 
 def check_db():
-    if my_mongo_wrapper:
+    if my_data_wrapper:
         return True
     return False
 
 
 def return_db():
-    return my_mongo_wrapper
+    return my_data_wrapper

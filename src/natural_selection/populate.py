@@ -1,7 +1,7 @@
 import logging
 import random
 
-from src.tools import check_db, return_db
+from src.tools import return_db
 from src import is_generic, get_population_size
 from settings.generic_model import GENERIC_PARAMS
 from settings.human_model import HUMAN_PARAMS
@@ -15,16 +15,10 @@ def create_individuals(environment_name):
     :return: resulting set of individuals
     :rtype: list or DBWrapper
     """
-    current_population = []
-    if check_db():
-        return_db().create_collection_and_set('{}_{}'.format(environment_name, 1))
-        current_population = return_db()
+    current_population = return_db()
     for index in range(0, get_population_size()):
         params = obtain_params(index)
-        if check_db():
-            return_db().insert_document('{}_{}'.format(environment_name, 1), params)
-        else:
-            current_population.append(params)
+        current_population['{}_{}'.format(environment_name, 1)].append(params)
     logging.debug("Created a starting set of {} individuals".format(get_population_size()))
     return current_population
 
