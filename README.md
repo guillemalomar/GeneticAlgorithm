@@ -141,7 +141,8 @@ Genetic Algorithm
 optional arguments:
   -h, --help            show this help message and exit
   -a, --about           (flag) obtain a breve about the application
-  -db, --database       (flag) activate MongoDB
+  -db DATABASE, --database DATABASE
+                        (text) use the specified DB (currently only MongoDB is available)
   -g, --generic         (flag) activate generic mode, to use the parameters in the settings/generic_model.py file
   -n NAME, --name NAME  (text) name of the single execution
   -p PARAMS, --params PARAMS
