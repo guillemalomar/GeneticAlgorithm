@@ -8,22 +8,25 @@ from settings.settings import MESSAGES
 class DataWrapper:
     def __init__(self, db=None, environment=None):
         if db.lower() == 'mongodb':
+            self.db = True
             self.my_data = MongoWrapper()
         elif db.lower() == 'mysql':
+            self.db = True
             self.my_data = SqlWrapper(environment)
         elif db.lower() == 'not defined':
+            self.db = False
             self.my_data = {}
         else:
             print(MESSAGES["WRONG_DATABASE"])
             sys.exit()
 
     def __setitem__(self, key, value):
-        if type(self.my_data) is dict and key not in self.my_data:
+        if not self.db and key not in self.my_data:
             self.my_data[key] = value
         self.my_data.__setitem__(key, value)
 
     def __getitem__(self, item):
-        if type(self.my_data) is dict and item not in self.my_data:
+        if not self.db and item not in self.my_data:
             self.my_data[item] = []
         return self.my_data[item]
 

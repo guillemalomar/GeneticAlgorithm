@@ -21,7 +21,7 @@ def execute_genetic_algorithm(maximum_iterations, environment):
     :param environment: current environment
     :type environment: Environment
     """
-    my_plot.set_plots()
+    my_plot.set_plots(environment)
     execution_message(environment)
     my_plot.add_limits(environment.data)
     logging.info(MESSAGES["POP_STAGE"])
