@@ -4,7 +4,7 @@ import unittest
 from src.natural_selection.filter import filter_individuals, human_value_function
 from src.environment import Environment
 from src import get_population_size
-from src.tools.data_wrapper import DataWrapper
+from src.tools.database.data_wrapper import DataWrapper
 from src.tools import set_db
 
 

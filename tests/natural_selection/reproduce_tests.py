@@ -2,7 +2,7 @@ import asyncio
 import random
 import unittest
 
-from src.tools.data_wrapper import DataWrapper
+from src.tools.database.data_wrapper import DataWrapper
 from src.tools import set_db
 from settings.settings import mutation_factor
 from settings.human_model import HUMAN_PARAMS

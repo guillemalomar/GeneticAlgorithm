@@ -2,7 +2,7 @@ import unittest
 
 from src.natural_selection.natural_death import natural_death
 from src import get_population_size
-from src.tools.data_wrapper import DataWrapper
+from src.tools.database.data_wrapper import DataWrapper
 from src.tools import set_db
 
 

@@ -3,12 +3,12 @@ import mysql.connector
 import sys
 
 from creds import MYSQL_PARAMS
-from settings.settings import MESSAGES
+from src.tools.database.settings import MYSQL_MESSAGES
 
 
-class SqlWrapper:
+class MysqlDbWrapper:
     """
-    Wrapper for SQL Database
+    Wrapper for MySQL Database
     """
     def __init__(self, model):
         """
@@ -22,11 +22,14 @@ class SqlWrapper:
 
         self.db = self.connect()
         self.cursor = self.db.cursor()
+        self.check_database()
+        self.tables = {}
+        self.model = model
+
+    def check_database(self):
         self.delete_database(self.db_n)
         self.create_database(self.db_n)
         self.use_database(self.db_n)
-        self.tables = {}
-        self.model = model
 
     def connect(self):
         try:
@@ -34,35 +37,35 @@ class SqlWrapper:
                                                  user=self.user,
                                                  password=self.password,
                                                  auth_plugin='mysql_native_password')
-            logging.info(MESSAGES['MYSQL_CONN_SUCC'])
+            logging.info(MYSQL_MESSAGES['MYSQL_CONN_SUCC'])
             return connection
         except Exception as exc:
-            logging.ERROR(MESSAGES['MYSQL_CONN_ERR'].format(exc))
+            logging.ERROR(MYSQL_MESSAGES['MYSQL_CONN_ERR'].format(exc))
             sys.exit()
 
     def use_database(self, db_name):
         try:
             self.cursor.execute('USE  {}'.format(db_name))
-            logging.debug(MESSAGES["MYSQL_USE_SUCC"].format(db_name))
+            logging.debug(MYSQL_MESSAGES["MYSQL_USE_SUCC"].format(db_name))
         except Exception as exc:
-            logging.error(MESSAGES["MYSQL_USE_ERR"].format(db_name, exc))
+            logging.error(MYSQL_MESSAGES["MYSQL_USE_ERR"].format(db_name, exc))
             sys.exit()
 
     def create_database(self, db_name):
         try:
-            self.cursor.execute('CREATE DATABASE IF NOT EXISTS {}'.format(db_name))
+            self.cursor.execute(MYSQL_MESSAGES["CREATE_DB_QUERY"].format(db_name))
             self.db.commit()
-            logging.debug(MESSAGES["MYSQL_SUCC_CRE_DB"].format(db_name))
+            logging.debug(MYSQL_MESSAGES["MYSQL_SUCC_CRE_DB"].format(db_name))
         except Exception as exc:
-            logging.error(MESSAGES["MYSQL_ERR_CRE_DB"].format(db_name, exc))
+            logging.error(MYSQL_MESSAGES["MYSQL_ERR_CRE_DB"].format(db_name, exc))
 
     def delete_database(self, db_name):
         try:
-            self.cursor.execute('DROP DATABASE IF EXISTS {}'.format(db_name))
+            self.cursor.execute(MYSQL_MESSAGES["DROP_DB_QUERY"].format(db_name))
             self.db.commit()
-            logging.debug(MESSAGES["MYSQL_SUCC_DEL_DB"].format(db_name))
+            logging.debug(MYSQL_MESSAGES["MYSQL_SUCC_DEL_DB"].format(db_name))
         except Exception as exc:
-            logging.error(MESSAGES["MYSQL_ERR_DEL_DB"].format(db_name, exc))
+            logging.error(MYSQL_MESSAGES["MYSQL_ERR_DEL_DB"].format(db_name, exc))
 
     def create_table(self, table_name):
         try:
@@ -72,18 +75,18 @@ class SqlWrapper:
             self.cursor.execute(
                 to_exec.format(table_name, values)
             )
-            self.tables[table_name] = SqlTableWrapper(table_name, self.db, self.cursor, self.model)
-            logging.debug(MESSAGES["MYSQL_SUCC_CRE_TAB"].format(table_name))
+            self.tables[table_name] = MysqlTableWrapper(table_name, self.db, self.cursor, self.model)
+            logging.debug(MYSQL_MESSAGES["MYSQL_SUCC_CRE_TAB"].format(table_name))
         except Exception as exc:
-            logging.error(MESSAGES["MYSQL_ERR_CRE_TAB"].format(table_name, exc))
+            logging.error(MYSQL_MESSAGES["MYSQL_ERR_CRE_TAB"].format(table_name, exc))
 
     def delete_table(self, table_name):
         try:
-            self.cursor.execute('DROP TABLE {}'.format(table_name))
+            self.cursor.execute(MYSQL_MESSAGES["DROP_TABLE_QUERY"].format(table_name))
             del self.tables[table_name]
-            logging.debug(MESSAGES["MYSQL_SUCC_DEL_TAB"].format(table_name))
+            logging.debug(MYSQL_MESSAGES["MYSQL_SUCC_DEL_TAB"].format(table_name))
         except Exception as exc:
-            logging.error(MESSAGES["MYSQL_ERR_DEL_TAB"].format(table_name, exc))
+            logging.error(MYSQL_MESSAGES["MYSQL_ERR_DEL_TAB"].format(table_name, exc))
 
     def insert_entry(self, table_name, item):
         self.tables[table_name].append(item)
@@ -113,9 +116,9 @@ class SqlWrapper:
         return
 
 
-class SqlTableWrapper:
+class MysqlTableWrapper:
     """
-    Wrapper for SQL table
+    Wrapper for MySQL table
     """
     def __init__(self, name, db, cursor, model):
         self.name = name
@@ -130,7 +133,7 @@ class SqlTableWrapper:
 
     def __getitem__(self, item):
         column_names = ', '.join(x for x in self.model.keys()) + ', `_id`, `age`, `value`'
-        self.cursor.execute('SELECT {} FROM `{}` WHERE `_id` = {} LIMIT 1;'.format(column_names, self.name, item))
+        self.cursor.execute(MYSQL_MESSAGES["SELECT_ONE_QUERY"].format(column_names, self.name, item))
         results = self.cursor.fetchall()
         if len(results) > 0:
             individual = dict(self.model)
@@ -156,7 +159,7 @@ class SqlTableWrapper:
         column_names = ', '.join(x for x in item.keys() if x in self.model.keys())
         column_values = ', '.join(str(y) for x, y in item.items() if x in self.model.keys())
         if '_id' not in column_names:
-            query = 'INSERT INTO `{}` (`_id`, `age`, `value`, {}) VALUES ({}, {}, {}, {})'
+            query = MYSQL_MESSAGES["INSERT_QUERY_2"]
             self.cursor.execute(query.format(
                 self.name,
                 column_names,
@@ -167,7 +170,7 @@ class SqlTableWrapper:
             )
             self.db.commit()
         else:
-            query = 'INSERT INTO `{}` ({}) VALUES ({})'
+            query = MYSQL_MESSAGES["INSERT_QUERY"]
             self.cursor.execute(query.format(
                 self.name,
                 column_names,
@@ -182,7 +185,7 @@ class SqlTableWrapper:
     def sort(self, key, reverse):
         column_names = ', '.join(x for x in self.model.keys()) + ', `_id`, `age`, `value`'
         to_sort = str(key).split('\'')[1]
-        query = 'SELECT {} FROM `{}` ORDER BY `{}`'
+        query = MYSQL_MESSAGES["SORT_QUERY"]
         query += ' DESC' if reverse else ' ASC'
         self.cursor.execute(query.format(column_names, self.name, to_sort))
         results = self.cursor.fetchall()
@@ -199,8 +202,7 @@ class SqlTableWrapper:
 
     def limit(self, max_to_return):
         column_names = ', '.join(x for x in self.model.keys()) + ', `_id`, `age`, `value`'
-        query = 'SELECT {} FROM `{}` LIMIT `{}`'
-        self.cursor.execute(query.format(column_names, self.name, max_to_return))
+        self.cursor.execute(MYSQL_MESSAGES["SELECT_LIMIT_QUERY"].format(column_names, self.name, max_to_return))
         results = self.cursor.fetchall()
         individuals = []
         for ind, entry in enumerate(results):
@@ -223,12 +225,12 @@ class SqlTableWrapper:
         self.append(item)
 
     def delete_one(self, key):
-        self.cursor.execute('DELETE FROM {} WHERE `_id` = {}'.format(self.name, key))
+        self.cursor.execute(MYSQL_MESSAGES["DELETE_ONE_QUERY"].format(self.name, key))
         self.db.commit()
 
     def find(self):
         column_names = ', '.join(x for x in self.model.keys()) + ', `_id`, `age`, `value`'
-        self.cursor.execute('SELECT {} FROM `{}`;'.format(column_names, self.name))
+        self.cursor.execute(MYSQL_MESSAGES["SELECT_QUERY"].format(column_names, self.name))
         results = self.cursor.fetchall()
         individuals = []
         for entry in results:
@@ -252,6 +254,6 @@ class SqlTableWrapper:
         return
 
     def check_size(self):
-        self.cursor.execute('SELECT COUNT(*) FROM {}'.format(self.name))
+        self.cursor.execute(MYSQL_MESSAGES["COUNT_QUERY"].format(self.name))
         results = self.cursor.fetchall()
         return results[0][0]
