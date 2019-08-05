@@ -5,7 +5,7 @@
 [logo5]: documentation/Evolution.png?style=centerme "Header"
 
 *    Author: Guillem Alomar      
-*    Current release: July 31st, 2019                     
+*    Current release: August 5th, 2019                     
 *    Code version: 1.0                      
 *    Availability: Public
 
@@ -36,9 +36,11 @@ PIP packages
 - numpy 1.16.4
 - pytest 5.0.1
 
-Optional. If you want to use MongoDB, you will also need to install the following PIP package:
+Optional. If you want to use MongoDB or MySQL, you will also need to install the following PIP packages:
 
 - pymongo 3.8.0
+- mysql-connector-python 8.0.14
+mysql-connector-python-rf 2.2.2
 
 ## Documentation
 
@@ -131,9 +133,9 @@ Now that the server is running, we can execute the application. This is done by 
 You can define a custom environment by activating the custom flag:
 
 ```
--> % python GeneticAlgorithm.py -h
-usage: GeneticAlgorithm.py [-h] [-a] [-db] [-g] [-n NAME] [-p PARAMS] [-m]
-                           [-e] [-pop POPULATION] [-i ITERATIONS]
+-> % -> % python GeneticAlgorithm.py -h
+usage: GeneticAlgorithm.py [-h] [-a] [-db DATABASE] [-g] [-n NAME] [-p PARAMS]
+                           [-m] [-e] [-pop POPULATION] [-i ITERATIONS]
                            [-mf MUTATIONFACTOR]
 
 Genetic Algorithm
@@ -142,7 +144,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -a, --about           (flag) obtain a breve about the application
   -db DATABASE, --database DATABASE
-                        (text) use the specified DB (currently only MongoDB is available)
+                        (string) activate database [MongoDB, MySQL]
   -g, --generic         (flag) activate generic mode, to use the parameters in the settings/generic_model.py file
   -n NAME, --name NAME  (text) name of the single execution
   -p PARAMS, --params PARAMS
@@ -237,6 +239,7 @@ I have chosen these specific parameters because I think they are useful to show 
 I have decided to use asyncio not only because I wanted to improve my knowledge on the library, but also because I really needed a good parallel library in order to obtain a good performance in both the filtering stage and the reproducing stage.
 
 I'm using MongoDB because the kind of data that I use fits really well (dictionaries) and with MongoDB Compass I can obtain some valuable information from resulting datasets. It also allows to use much bigger datasets, as it's single read/write, so we don't need to have the full individuals dataset loaded in memory at any time. Bear in mind that the performance is much worse when this mode is activated.
+I have also added support for MySQL because it's one of the most used DDBBs and I thought it could be useful.
 
 I have decided not to use an API for a few reasons. The dataset used by the algorithm is intern, there are no external outputs, so to have an internal API only to encapsulate the processing code wouldn't make much sense. It would complicate the application without any strong reason.
 
