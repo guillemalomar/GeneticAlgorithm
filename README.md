@@ -120,7 +120,7 @@ You will also need to create your own _creds.py_ file. Use the _creds_dummy.py_ 
 
 ### Executing the application
 
-Now that the server is running, we can execute the application. This is done by typing this:
+We can execute the application with the following command:
 ```
 ~/GeneticAlgorithm$ python GeneticAlgorithm.py
 ```
