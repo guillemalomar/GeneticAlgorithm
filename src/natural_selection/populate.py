@@ -34,13 +34,10 @@ def obtain_params(index):
     """
     params = {
         '_id': index,
-        'age': int(index / (get_population_size() / 5)) + 1
+        'age': int(index / (get_population_size() / 5)) + 1,
+        'value': 0
     }
-    if not is_generic():
-        for k, v in HUMAN_PARAMS.items():
-            params[k] = round(random.uniform(v[0], v[1]), 3)
-        params['total_reach'] = round(params['height'] + params['jump'] + params['arm_length'], 3)
-    else:
-        for k, v in GENERIC_PARAMS.items():
-            params[k] = round(random.uniform(v[0], v[1]), 3)
+    individual_params = dict(GENERIC_PARAMS) if is_generic() else dict(HUMAN_PARAMS)
+    for k, v in individual_params.items():
+        params[k] = round(random.uniform(v[0], v[1]), 3)
     return params

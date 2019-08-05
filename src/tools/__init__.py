@@ -5,11 +5,11 @@ my_plot = PlotWrapper()
 my_data_wrapper = {}
 
 
-def set_db(to_activate=None):
+def set_db(to_activate=None, environment=None):
     from src.tools.data_wrapper import DataWrapper
     global my_data_wrapper
     if to_activate:
-        my_data_wrapper = DataWrapper(to_activate)
+        my_data_wrapper = DataWrapper(to_activate, environment)
     else:
         my_data_wrapper = DataWrapper()
 

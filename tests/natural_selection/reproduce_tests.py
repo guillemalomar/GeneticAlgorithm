@@ -2,18 +2,21 @@ import asyncio
 import random
 import unittest
 
-from settings.settings import initial_population_size, mutation_factor
+from src.tools.data_wrapper import DataWrapper
+from src.tools import set_db
+from settings.settings import mutation_factor
 from settings.human_model import HUMAN_PARAMS
 from src.natural_selection.reproduce import obtain_children,\
     obtain_randomized_pairs,\
     obtain_pairs_of_individuals
+from src import get_population_size
 
 
 class ReproduceTests(unittest.TestCase):
 
     def test_obtain_randomized_individuals(self):
-        my_indivs = obtain_randomized_pairs(int(initial_population_size * 0.6))
-        self.assertEqual(len(my_indivs), int(initial_population_size * 0.3))
+        my_indivs = obtain_randomized_pairs(int(get_population_size() * 0.6))
+        self.assertEqual(len(my_indivs), int(get_population_size() * 0.3))
         for ind1, i in enumerate(my_indivs):
             for ind2, j in enumerate(my_indivs):
                 if ind1 != ind2 and i == j:
@@ -21,7 +24,7 @@ class ReproduceTests(unittest.TestCase):
 
     def test_obtain_randomized_pair_of_individuals(self):
         num_inds = 6000
-        curr_pop = []
+        individuals = []
         for i in range(0, num_inds):
             indiv = {
                 'height': 1,
@@ -31,11 +34,12 @@ class ReproduceTests(unittest.TestCase):
                 'jump': 5,
                 'skin_thickness': 6
             }
-            curr_pop.append(indiv)
+            individuals.append(indiv)
+        curr_pop = {'bla_1_filtered': individuals}
         my_pairs = obtain_randomized_pairs(num_inds)
-        new_indivs = obtain_pairs_of_individuals(curr_pop, my_pairs)
-        self.assertEquals(len(my_pairs), int(initial_population_size * 0.3))
-        self.assertEquals(len(new_indivs), int(initial_population_size * 0.6))
+        new_indivs = obtain_pairs_of_individuals(curr_pop, my_pairs, 'bla_1_filtered')
+        self.assertEquals(len(my_pairs), int(get_population_size() * 0.3))
+        self.assertEquals(len(new_indivs), int(get_population_size() * 0.6))
         self.assertTrue('_id' in new_indivs[0])
         for pair in my_pairs:
             self.assertTrue(len(pair) == 2)
@@ -44,8 +48,9 @@ class ReproduceTests(unittest.TestCase):
         _ = asyncio.run(self.async_obtain_children(0, 1))
 
     async def async_obtain_children(self, indiv1_ind, indiv2_ind):
-        rand_idx = random.randint(0, initial_population_size)
-        rand_iter = random.randint(0, initial_population_size)
+        set_db("Not defined")
+        rand_idx = random.randint(0, get_population_size())
+        rand_iter = random.randint(0, get_population_size())
 
         indiv1_rand_height = random.uniform(HUMAN_PARAMS['height'][0],
                                             HUMAN_PARAMS['height'][1])
@@ -88,12 +93,15 @@ class ReproduceTests(unittest.TestCase):
             'jump': indiv2_jump,
             'skin_thickness': indiv2_skin_thickness
         }
-        current_population = [indiv1, indiv2]
+        current_population = DataWrapper("Not defined")
+        current_population["test_pop"] = [indiv1, indiv2]
         new_child = [
-            asyncio.ensure_future(obtain_children(rand_idx, rand_iter, indiv1_ind, indiv2_ind, current_population))
+            asyncio.ensure_future(
+                obtain_children(rand_idx, rand_iter, indiv1_ind, indiv2_ind, current_population, "test_pop")
+            )
         ]
-        response = await asyncio.gather(*new_child)
-        new_child = response[0]
+        _ = await asyncio.gather(*new_child)
+        new_child = current_population["test_reproduction"][0]
         self.assertTrue(new_child['height'] > (indiv1['height'] + indiv2['height']) / 2 -
                         ((indiv1['height'] + indiv2['height']) * mutation_factor))
         self.assertTrue(new_child['height'] < (indiv1['height'] + indiv2['height']) / 2 +
@@ -118,4 +126,4 @@ class ReproduceTests(unittest.TestCase):
                         ((indiv1['skin_thickness'] + indiv2['skin_thickness']) * mutation_factor))
         self.assertTrue(new_child['skin_thickness'] < (indiv1['skin_thickness'] + indiv2['skin_thickness']) / 2 +
                         ((indiv1['skin_thickness'] + indiv2['skin_thickness']) * mutation_factor))
-        return response[0]
+        return 1

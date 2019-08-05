@@ -4,6 +4,7 @@ import sys
 from pymongo import MongoClient
 
 from creds import MONGODB_PARAMS
+from settings.settings import MESSAGES
 
 
 class MongoWrapper:
@@ -42,28 +43,40 @@ class MongoWrapper:
             if MONGODB_PARAMS['database'] in self.client.list_database_names():
                 self.delete_database(MONGODB_PARAMS['database'])
             self.create_database(MONGODB_PARAMS['database'])
-        except pymongo.errors.ServerSelectionTimeoutError:
-            logging.error("MongoDB parameters not correct. Check the creds.py file, or create it from creds_dummy.py." +
-                          "If you don't want to use MongoDB, don't activate the --db flag.")
+            logging.debug(MESSAGES["MONGODB_CONN_SUCC"])
+        except pymongo.errors.ServerSelectionTimeoutError as exc:
+            logging.error(MESSAGES["MONGODB_CONN_ERR".format(exc)])
             sys.exit()
 
     def create_database(self, db_name):
-        logging.debug("Database {} created".format(db_name))
-        self.db = self.client[db_name]
+        try:
+            self.db = self.client[db_name]
+            logging.debug(MESSAGES["MONGODB_SUCC_CRE_DB"].format(db_name))
+        except Exception as exc:
+            logging.error(MESSAGES["MONGODB_ERR_CRE_DB"].format(db_name, exc))
 
     def delete_database(self, db_name):
-        logging.debug("Database {} deleted".format(db_name))
-        self.client.drop_database(db_name)
+        try:
+            self.client.drop_database(db_name)
+            logging.debug(MESSAGES["MONGODB_SUCC_DEL_DB"].format(db_name))
+        except Exception as exc:
+            logging.error(MESSAGES["MONGODB_ERR_DEL_DB"].format(db_name, exc))
 
     def create_collection(self, collection_name):
-        logging.debug("Collection {} created".format(collection_name))
-        self.collections['{}'.format(collection_name)] = \
-            MongoCollectionWrapper('{}'.format(collection_name),
-                                   self.db['{}'.format(collection_name)])
+        try:
+            self.collections['{}'.format(collection_name)] = \
+                MongoCollectionWrapper('{}'.format(collection_name),
+                                       self.db['{}'.format(collection_name)])
+            logging.debug(MESSAGES["MONGODB_SUCC_CRE_COLL"].format(collection_name))
+        except Exception as exc:
+            logging.error(MESSAGES["MONGODB_ERR_CRE_COLL"].format(collection_name, exc))
 
     def delete_collection(self, collection_name):
-        logging.debug("Collection {} deleted".format(collection_name))
-        self.collections['{}'.format(collection_name)].drop()
+        try:
+            self.collections['{}'.format(collection_name)].drop()
+            logging.debug(MESSAGES["MONGODB_SUCC_DEL_COLL"].format(collection_name))
+        except Exception as exc:
+            logging.error(MESSAGES["MONGODB_ERR_DEL_COLL".format(collection_name, exc)])
 
     def insert_document(self, collection_name, document):
         self.collections['{}'.format(collection_name)].insert_one(document)

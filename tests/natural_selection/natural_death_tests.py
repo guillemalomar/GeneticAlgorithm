@@ -9,8 +9,8 @@ from src.tools import set_db
 class NaturalDeathTests(unittest.TestCase):
 
     def test_natural_death(self):
-        set_db("To define")
-        population = DataWrapper("To define")
+        set_db("Not defined")
+        population = DataWrapper("Not defined")
         collection = []
         for i in range(0, get_population_size() + 100):
             ind = {

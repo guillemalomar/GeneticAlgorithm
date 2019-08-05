@@ -68,10 +68,7 @@ async def evaluate_individual(current_population, individual_id, environment, it
     base_coll_name = '{}_{}'.format(environment.name, iteration)
     individual = current_population[base_coll_name][individual_id]
     if not is_generic():
-        try:
-            individual_value = human_value_function(individual, environment.data)
-        except Exception as exc:
-            print(exc)
+        individual_value = human_value_function(individual, environment.data)
         if not is_food_accessible(individual, environment.data):
             individual_value = individual_value * 0.5
         individual_value = human_penalize_extremes(individual, individual_value, environment.data)
@@ -122,7 +119,9 @@ def human_value_function(individual, environment):
     total_reach = individual['height'] + individual['arm_length'] + individual['jump']
 
     total_value = 0
-    total_value += HUMAN_WEIGHTS['total_reach'] * min(total_reach / environment['tree_height'], 1)
+    total_value += (HUMAN_WEIGHTS['height'] +
+                    HUMAN_WEIGHTS['jump'] +
+                    HUMAN_WEIGHTS['arm_length']) * min(total_reach / environment['tree_height'], 1)
     total_value += HUMAN_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
     total_value += HUMAN_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
     total_value += HUMAN_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
@@ -147,7 +146,9 @@ def human_penalize_extremes(individual, total_value, environment):
     ind_speed_vs_food = individual['speed'] / environment['food_animals_speed']
     ind_strength_vs_food = individual['strength'] / environment['food_animals_strength']
     ind_skin_vs_temp = individual['skin_thickness'] / skin_threshold
-    ind_reach_vs_trees = individual['total_reach'] / environment['tree_height']
+    ind_reach_vs_trees = (individual['height'] +
+                          individual['jump'] +
+                          individual['arm_length']) / environment['tree_height']
 
     if ind_reach_vs_trees > 1.1:
         total_value = total_value * 0.5
@@ -261,7 +262,9 @@ def is_food_accessible(individual, environment):
     :return: true if the individual has a way of finding food. false otherwise.
     :rtype: bool
     """
-    if (individual['total_reach'] < environment['tree_height']) or \
+    if ((individual['height'] +
+         individual['jump'] +
+         individual['arm_length']) < environment['tree_height']) or \
         (individual['speed'] <= environment['food_animals_speed'] and
          individual['strength'] <= environment['food_animals_strength']):
         return False

@@ -10,7 +10,9 @@ HUMAN_PARAMS = {
 HUMAN_WEIGHTS = {
     'speed': 0.225,
     'strength': 0.225,
-    'total_reach': 0.5,
+    'arm_length': 0.15,
+    'jump': 0.15,
+    'height': 0.2,
     'skin_thickness': 0.05
 }
 

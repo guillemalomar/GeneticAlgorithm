@@ -232,7 +232,6 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
                 HUMAN_PARAMS['skin_thickness'][1] * 1.2)),
             3
         )
-        child['total_reach'] = round(child['height'] + child['jump'] + child['arm_length'], 3)
     else:
         for param, value in ind1.items():
             if param != '_id' and param != 'age' and param != 'value':
@@ -244,6 +243,7 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
                         GENERIC_PARAMS[param][1] * 1.2)),
                     3
                 )
+    child['value'] = 0
     reproduction_collection = '{}_{}'.format('_'.join(filtered_coll.split('_')[:-1]), 'reproduction')
     current_population[reproduction_collection].append(child)
     return index
