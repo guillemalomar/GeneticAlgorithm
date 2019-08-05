@@ -26,21 +26,18 @@
 ## Requirements
 
 Programming language
-
 - Python +3.7
 
 PIP packages
-
 - asyncio 3.4.3
 - matplotlib 3.1.1
 - numpy 1.16.4
 - pytest 5.0.1
 
 Optional. If you want to use MongoDB or MySQL, you will also need to install the following PIP packages:
-
 - pymongo 3.8.0
 - mysql-connector-python 8.0.14
-mysql-connector-python-rf 2.2.2
+- mysql-connector-python-rf 2.2.2
 
 ## Documentation
 
