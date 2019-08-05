@@ -1,9 +1,9 @@
 import argparse
 import sys
 
-from settings.generic_model import GENERIC_ENVIRONMENT_DEFAULT, GENERIC_ENVIRONMENTS
-from settings.human_model import HUMAN_ENVIRONMENT_DEFAULT, HUMAN_ENVIRONMENTS
-from settings.settings import max_iterations, elitism, mutation_factor, initial_population_size
+from settings.generic_model import GENERIC_ENVIRONMENT_DEFAULT, GENERIC_ENVIRONMENTS, GENERIC_PARAMS
+from settings.human_model import HUMAN_ENVIRONMENT_DEFAULT, HUMAN_ENVIRONMENTS, HUMAN_PARAMS
+from settings.settings import max_iterations, elitism, mutation_factor, initial_population_size, MESSAGES
 from src import set_generic, set_elitist, set_mutation_factor, set_population_size
 from src.tools import set_db
 from src.tools.printers import show_about
@@ -35,7 +35,7 @@ def args_handler(argv):
 
     p.add_argument('-db', '--database', action='store', type=str,
                    default="Not defined",
-                   help='(string) activate database [mongodb]')
+                   help='(string) activate database [MongoDB, MySQL]')
 
     p.add_argument('-g', '--generic', action='store_true',
                    default=False,
@@ -78,13 +78,11 @@ def check_input(args):
         sys.exit()
 
     if args.multiple and not args.name == "Not defined":
-        print("The multiple flag has been activated, but a name for a single execution has been given.")
-        print("Check your input parameters")
+        print(MESSAGES["MULTIPLE_AND_NAME"])
         sys.exit()
 
     if args.multiple and args.params != "Not defined":
-        print("The multiple flag has been activated, but single parameters have been specified.")
-        print("Check your input parameters")
+        print(MESSAGES["MULTIPLE_AND_PARAM"])
         sys.exit()
 
     if args.params != "Not defined":
@@ -94,44 +92,36 @@ def check_input(args):
             print(exec_params)
             args.params = [float(param) for param in exec_params]
         except TypeError:
-            print("The format of params is incorrect.")
+            print(MESSAGES["INCORR_PARAM_FORMAT"])
             sys.exit()
         if args.generic:
             if len(GENERIC_ENVIRONMENT_DEFAULT.keys()) != len(args.params):
-                print("The number of params is incorrect.")
+                print(MESSAGES["INCORR_PARAM_NUMBER"])
                 sys.exit()
         else:
             if len(HUMAN_ENVIRONMENT_DEFAULT.keys()) != len(args.params):
-                print("The number of params is incorrect.")
+                print(MESSAGES["INCORR_PARAM_NUMBER"])
                 sys.exit()
     return args
 
 
 def set_globals(args):
-    set_db(args.database)
     set_generic(args.generic)
     set_elitist(args.elitist)
     set_mutation_factor(args.mutationfactor)
     set_population_size(args.population)
+    args = obtain_environments(args)
+    set_db(args.database, args.individuals)
 
 
 def obtain_environments(args):
     if args.multiple:
-        if args.generic:
-            to_process = GENERIC_ENVIRONMENTS
-        else:
-            to_process = HUMAN_ENVIRONMENTS
+        args.environments = GENERIC_ENVIRONMENTS if args.generic else HUMAN_ENVIRONMENTS
     else:
         if args.name == "Not defined":
-            if args.generic:
-                args.name = "GenericExecution"
-            else:
-                args.name = "HumanExecution"
+            args.name = "GenericExecution" if args.generic else "HumanExecution"
 
-        if args.generic:
-            execution_params = GENERIC_ENVIRONMENT_DEFAULT
-        else:
-            execution_params = HUMAN_ENVIRONMENT_DEFAULT
+        execution_params = GENERIC_ENVIRONMENT_DEFAULT if args.generic else HUMAN_ENVIRONMENT_DEFAULT
 
         if args.params != "Not defined":
             if args.generic:
@@ -141,6 +131,8 @@ def obtain_environments(args):
                 for ind, key in enumerate(HUMAN_ENVIRONMENT_DEFAULT.keys()):
                     execution_params[key] = float(args.params[ind])
 
-        to_process = {args.name: execution_params}
+        args.environments = {args.name: execution_params}
 
-    return to_process
+    args.individuals = dict(GENERIC_PARAMS) if args.generic else dict(HUMAN_PARAMS)
+
+    return args

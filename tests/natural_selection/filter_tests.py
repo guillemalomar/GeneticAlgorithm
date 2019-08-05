@@ -11,7 +11,7 @@ from src.tools import set_db
 class FilterTests(unittest.TestCase):
 
     def test_filter_individuals(self):
-        set_db("To define")
+        set_db("Not defined")
         environment_params = {
             'tree_height': 1.0,
             'temperature': 20.0,
@@ -20,7 +20,7 @@ class FilterTests(unittest.TestCase):
             'food_animals_strength': 1.0
         }
         environment = Environment('Bla', environment_params)
-        population = DataWrapper("To define")
+        population = DataWrapper("Not defined")
         collection = []
         for i in range(0, get_population_size() + 50):
             ind = {
