@@ -1,18 +1,18 @@
 import sys
 
-from src.tools.database.mongo_wrapper import MongoWrapper
-from src.tools.database.sql_wrapper import SqlWrapper
-from settings.settings import MESSAGES
+from src.tools.database.mongodb_wrapper import MongodbDbWrapper
+from src.tools.database.mysql_wrapper import MysqlDbWrapper
+from src.tools.database.settings import MESSAGES
 
 
 class DataWrapper:
     def __init__(self, db=None, environment=None):
         if db.lower() == 'mongodb':
             self.db = True
-            self.my_data = MongoWrapper()
+            self.my_data = MongodbDbWrapper()
         elif db.lower() == 'mysql':
             self.db = True
-            self.my_data = SqlWrapper(environment)
+            self.my_data = MysqlDbWrapper(environment)
         elif db.lower() == 'not defined':
             self.db = False
             self.my_data = {}

@@ -4,10 +4,10 @@ import sys
 from pymongo import MongoClient
 
 from creds import MONGODB_PARAMS
-from settings.settings import MESSAGES
+from src.tools.database.settings import MONGO_MESSAGES
 
 
-class MongoWrapper:
+class MongodbDbWrapper:
     """
     Wrapper for Mongo Database
     """
@@ -36,47 +36,45 @@ class MongoWrapper:
     def check_database(self):
         """
         Checks if the database exists in Mongo, deletes it if exists, and then creates a clean DB.
-        :return:
-        :rtype:
         """
         try:
             if MONGODB_PARAMS['database'] in self.client.list_database_names():
                 self.delete_database(MONGODB_PARAMS['database'])
             self.create_database(MONGODB_PARAMS['database'])
-            logging.debug(MESSAGES["MONGODB_CONN_SUCC"])
+            logging.debug(MONGO_MESSAGES["MONGODB_CONN_SUCC"])
         except pymongo.errors.ServerSelectionTimeoutError as exc:
-            logging.error(MESSAGES["MONGODB_CONN_ERR".format(exc)])
+            logging.error(MONGO_MESSAGES["MONGODB_CONN_ERR".format(exc)])
             sys.exit()
 
     def create_database(self, db_name):
         try:
             self.db = self.client[db_name]
-            logging.debug(MESSAGES["MONGODB_SUCC_CRE_DB"].format(db_name))
+            logging.debug(MONGO_MESSAGES["MONGODB_SUCC_CRE_DB"].format(db_name))
         except Exception as exc:
-            logging.error(MESSAGES["MONGODB_ERR_CRE_DB"].format(db_name, exc))
+            logging.error(MONGO_MESSAGES["MONGODB_ERR_CRE_DB"].format(db_name, exc))
 
     def delete_database(self, db_name):
         try:
             self.client.drop_database(db_name)
-            logging.debug(MESSAGES["MONGODB_SUCC_DEL_DB"].format(db_name))
+            logging.debug(MONGO_MESSAGES["MONGODB_SUCC_DEL_DB"].format(db_name))
         except Exception as exc:
-            logging.error(MESSAGES["MONGODB_ERR_DEL_DB"].format(db_name, exc))
+            logging.error(MONGO_MESSAGES["MONGODB_ERR_DEL_DB"].format(db_name, exc))
 
     def create_collection(self, collection_name):
         try:
             self.collections['{}'.format(collection_name)] = \
-                MongoCollectionWrapper('{}'.format(collection_name),
-                                       self.db['{}'.format(collection_name)])
-            logging.debug(MESSAGES["MONGODB_SUCC_CRE_COLL"].format(collection_name))
+                MongodbCollectionWrapper('{}'.format(collection_name),
+                                         self.db['{}'.format(collection_name)])
+            logging.debug(MONGO_MESSAGES["MONGODB_SUCC_CRE_COLL"].format(collection_name))
         except Exception as exc:
-            logging.error(MESSAGES["MONGODB_ERR_CRE_COLL"].format(collection_name, exc))
+            logging.error(MONGO_MESSAGES["MONGODB_ERR_CRE_COLL"].format(collection_name, exc))
 
     def delete_collection(self, collection_name):
         try:
             self.collections['{}'.format(collection_name)].drop()
-            logging.debug(MESSAGES["MONGODB_SUCC_DEL_COLL"].format(collection_name))
+            logging.debug(MONGO_MESSAGES["MONGODB_SUCC_DEL_COLL"].format(collection_name))
         except Exception as exc:
-            logging.error(MESSAGES["MONGODB_ERR_DEL_COLL".format(collection_name, exc)])
+            logging.error(MONGO_MESSAGES["MONGODB_ERR_DEL_COLL".format(collection_name, exc)])
 
     def insert_document(self, collection_name, document):
         self.collections['{}'.format(collection_name)].insert_one(document)
@@ -94,7 +92,7 @@ class MongoWrapper:
 
     def __getitem__(self, collection_name):
         if collection_name not in self.collections:
-            self.collections[collection_name] = MongoCollectionWrapper(
+            self.collections[collection_name] = MongodbCollectionWrapper(
                 collection_name,
                 self.db['{}'.format(collection_name)]
             )
@@ -105,7 +103,7 @@ class MongoWrapper:
         del self.collections[key]
 
 
-class MongoCollectionWrapper:
+class MongodbCollectionWrapper:
     """
     Wrapper for MongoDB collection
     """
@@ -140,12 +138,8 @@ class MongoCollectionWrapper:
         self.collection.insert_many(item)
 
     def sort(self, key, reverse):
-        # return self.collection.sort(key, reverse)
         to_sort = str(key).split('\'')[1]
-        if reverse:
-            reverse = -1
-        else:
-            reverse = 1
+        reverse = -1 if reverse else 1
         for idx, item in enumerate(self.collection.find({}).sort(to_sort, reverse)):
             self[idx] = item
 
