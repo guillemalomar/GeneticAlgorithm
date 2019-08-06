@@ -113,7 +113,7 @@ The algorithm has 3 main phases:
 
 - I recommend creating a virtualenv for this project. After creating it, you should run:
 ```
-~/GeneticAlgorithm$ pip install -r requirements.frozen
+~/GeneticAlgorithm$ pip install -r requirements.txt
 ```
 Now all pip packages needed have been installed.
 
