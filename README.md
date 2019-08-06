@@ -19,6 +19,7 @@
 * [Using the application](#using-the-application)
     * [First of all](#first-of-all)
     * [Executing the application](#executing-the-application)
+    * [Using your database](#using-your-database)
     * [Output](#output)
     * [Testing](#testing)
 * [Decisions taken](#decisions-taken)
@@ -130,7 +131,7 @@ We can execute the application with the following command:
 You can define a custom environment by activating the custom flag:
 
 ```
--> % -> % python GeneticAlgorithm.py -h
+-> % python GeneticAlgorithm.py -h
 usage: GeneticAlgorithm.py [-h] [-a] [-db DATABASE] [-g] [-n NAME] [-p PARAMS]
                            [-m] [-e] [-pop POPULATION] [-i ITERATIONS]
                            [-mf MUTATIONFACTOR]
@@ -173,6 +174,16 @@ _settings/human_model.py_:
 - change existing environments or create new ones
 - change the weights of the individuals parameters
 - change the default individuals parameter ranges
+
+### Using your Database
+
+This application has the option of using your MongoDB or MySQL database.
+
+In order to do so, you will need to create a _creds.py_ file in your main folder (you can use the _creds_dummy.py_ file as a guide) and add your database credentials. Also don't forget to specify the database that you want to use by adding the input parameter when running the application:
+
+```
+% python GeneticAlgorithm.py -db [mongodb|mysql]
+```
 
 ### Output
 
