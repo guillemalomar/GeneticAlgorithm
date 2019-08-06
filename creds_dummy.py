@@ -3,14 +3,12 @@ MONGODB_PARAMS = {
     'port': 0,
     'user': 'dummy_user',
     'pass': 'dummy_pass',
-    'database': 'dummy_database',
-    'collection': 'dummy_collection'
+    'database': 'dummy_database'
 }
 
 MYSQL_PARAMS = {
     'host': 'dummy_host',
     'user': 'dummy_user',
     'pass': 'dummy_pass',
-    'database': 'dummy_database',
-    'collection': 'dummy_table'
+    'database': 'dummy_database'
 }

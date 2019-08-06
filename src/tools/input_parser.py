@@ -34,7 +34,7 @@ def args_handler(argv):
                    help='(flag) obtain a breve about the application')
 
     p.add_argument('-db', '--database', action='store', type=str,
-                   default="Not defined",
+                   default="No db",
                    help='(string) activate database [MongoDB, MySQL]')
 
     p.add_argument('-g', '--generic', action='store_true',

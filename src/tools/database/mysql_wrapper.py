@@ -2,7 +2,6 @@ import logging
 import mysql.connector
 import sys
 
-from creds import MYSQL_PARAMS
 from src.tools.database.settings import MYSQL_MESSAGES
 
 
@@ -10,15 +9,15 @@ class MysqlDbWrapper:
     """
     Wrapper for MySQL Database
     """
-    def __init__(self, model):
+    def __init__(self, params, model):
         """
         Creates the connection with the DB, and recreates the initial connection for a clean execution
         """
-        self.host = MYSQL_PARAMS['host']
-        self.user = MYSQL_PARAMS['user']
-        self.password = MYSQL_PARAMS['pass']
-        self.db_n = MYSQL_PARAMS['database']
-        self.tb_n = MYSQL_PARAMS['table']
+        self.host = params['host']
+        self.user = params['user']
+        self.password = params['pass']
+
+        self.db_n = params['database']
 
         self.db = self.connect()
         self.cursor = self.db.cursor()

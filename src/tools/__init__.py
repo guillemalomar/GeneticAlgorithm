@@ -9,7 +9,14 @@ def set_db(to_activate=None, environment=None):
     from src.tools.database.data_wrapper import DataWrapper
     global my_data_wrapper
     if to_activate:
-        my_data_wrapper = DataWrapper(to_activate, environment)
+        if to_activate.lower() == 'mongodb':
+            from creds import MONGODB_PARAMS
+            my_data_wrapper = DataWrapper(db=to_activate, params=MONGODB_PARAMS)
+        elif to_activate.lower() == 'mysql':
+            from creds import MYSQL_PARAMS
+            my_data_wrapper = DataWrapper(db=to_activate, params=MYSQL_PARAMS, environment=environment)
+        elif to_activate.lower() == 'no db':
+            my_data_wrapper = DataWrapper()
     else:
         my_data_wrapper = DataWrapper()
 

@@ -3,7 +3,6 @@ import pymongo.errors
 import sys
 from pymongo import MongoClient
 
-from creds import MONGODB_PARAMS
 from src.tools.database.settings import MONGO_MESSAGES
 
 
@@ -11,22 +10,23 @@ class MongodbDbWrapper:
     """
     Wrapper for Mongo Database
     """
-    def __init__(self):
+    def __init__(self, params):
         """
         Creates the connection with the DB, and recreates the initial connection for a clean execution
         """
-        if 'user' in MONGODB_PARAMS:
+        self.params = params
+        if 'user' in self.params:
             self.client = MongoClient(
-                username=MONGODB_PARAMS['user'],
-                password=MONGODB_PARAMS['pass'],
-                host=MONGODB_PARAMS['host'],
-                port=MONGODB_PARAMS['port'],
+                username=self.params['user'],
+                password=self.params['pass'],
+                host=self.params['host'],
+                port=self.params['port'],
                 connect=True
             )
         else:
             self.client = MongoClient(
-                host=MONGODB_PARAMS['host'],
-                port=MONGODB_PARAMS['port'],
+                host=self.params['host'],
+                port=self.params['port'],
                 connect=True
             )
         self.db = None
@@ -38,9 +38,9 @@ class MongodbDbWrapper:
         Checks if the database exists in Mongo, deletes it if exists, and then creates a clean DB.
         """
         try:
-            if MONGODB_PARAMS['database'] in self.client.list_database_names():
-                self.delete_database(MONGODB_PARAMS['database'])
-            self.create_database(MONGODB_PARAMS['database'])
+            if self.params['database'] in self.client.list_database_names():
+                self.delete_database(self.params['database'])
+            self.create_database(self.params['database'])
             logging.debug(MONGO_MESSAGES["MONGODB_CONN_SUCC"])
         except pymongo.errors.ServerSelectionTimeoutError as exc:
             logging.error(MONGO_MESSAGES["MONGODB_CONN_ERR".format(exc)])
