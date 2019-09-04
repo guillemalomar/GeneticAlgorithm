@@ -174,26 +174,17 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
         + iteration \
         + 1
     mutation_factor = get_mutation_factor()
-    if not is_generic():
-        for parameter in ['height', 'speed', 'jump', 'strength', 'arm_length', 'skin_thickness']:
+    PARAMS_TO_READ = GENERIC_PARAMS if is_generic() else HUMAN_PARAMS
+    for parameter, value in ind1.items():
+        if parameter != '_id' and parameter != 'age' and parameter != 'value':
             child[parameter] = round(
-                float(np.clip((ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
-                                                                                       1 + mutation_factor),
-                              HUMAN_PARAMS[parameter][0] * 0.8,
-                              HUMAN_PARAMS[parameter][1] * 1.2)),
+                float(np.clip(
+                    (ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
+                                                                             1 + mutation_factor),
+                    PARAMS_TO_READ[parameter][0] * 0.8,
+                    PARAMS_TO_READ[parameter][1] * 1.2)),
                 3
             )
-    else:
-        for parameter, value in ind1.items():
-            if parameter != '_id' and parameter != 'age' and parameter != 'value':
-                child[parameter] = round(
-                    float(np.clip(
-                        (ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
-                                                                                 1 + mutation_factor),
-                        GENERIC_PARAMS[parameter][0] * 0.8,
-                        GENERIC_PARAMS[parameter][1] * 1.2)),
-                    3
-                )
     child['value'] = 0
     reproduction_collection = '{}_{}'.format('_'.join(filtered_coll.split('_')[:-1]), 'reproduction')
     current_population[reproduction_collection].append(child)
