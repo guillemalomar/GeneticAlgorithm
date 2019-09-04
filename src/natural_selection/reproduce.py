@@ -84,15 +84,11 @@ def mongo_obtain_pairs_of_individuals(current_population, filtered_population, i
     :return: list of randomized pairs
     :rtype: list of tuples of 2 ints
     """
-    new_iter_individuals = []
     for index, individual_pair in enumerate(individuals_pairs):
-        ind1 = filtered_population[individual_pair[0]]
-        ind1['_id'] = index
-        current_population.current_collection.insert_one(ind1)
-        new_iter_individuals.append(ind1)
-        ind2 = filtered_population[individual_pair[1]]
-        ind2['_id'] = index + int(get_population_size() * 0.3)
-        current_population.current_collection.insert_one(ind2)
+        for index2, step in enumerate([0, int(get_population_size() * 0.3)]):
+            individual = filtered_population[individual_pair[index2]]
+            individual['_id'] = index
+            current_population.current_collection.insert_one(individual)
     return individuals_pairs
 
 
@@ -135,28 +131,18 @@ async def pair_individuals(current_population, list_of_pairs, iteration, filtere
     """
     tasks = []
     for ind, pair in enumerate(list_of_pairs):
-        tasks.append(
-            asyncio.ensure_future(
-                obtain_children(ind + int(get_population_size() * 0.6),
-                                iteration,
-                                pair[0],
-                                pair[1],
-                                current_population,
-                                filtered_coll
-                                )
+        for step in [0, int(get_population_size() * 0.3)]:
+            tasks.append(
+                asyncio.ensure_future(
+                    obtain_children(ind + int(get_population_size() * 0.6) + step,
+                                    iteration,
+                                    pair[0],
+                                    pair[1],
+                                    current_population,
+                                    filtered_coll
+                                    )
+                )
             )
-        )
-        tasks.append(
-            asyncio.ensure_future(
-                obtain_children(ind + int(get_population_size() * 0.6) + int(get_population_size() * 0.3),
-                                iteration,
-                                pair[0],
-                                pair[1],
-                                current_population,
-                                filtered_coll
-                                )
-            )
-        )
     responses = await asyncio.gather(*tasks)
     return responses
 
@@ -189,58 +175,23 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
         + 1
     mutation_factor = get_mutation_factor()
     if not is_generic():
-        child['height'] = round(
-            float(np.clip((ind1['height'] + ind2['height']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                 1 + mutation_factor),
-                          HUMAN_PARAMS['height'][0] * 0.8,
-                          HUMAN_PARAMS['height'][1] * 1.2)),
-            3
-        )
-        child['speed'] = round(
-            float(np.clip((ind1['speed'] + ind2['speed']) / 2 * random.uniform(1 - mutation_factor,
-                                                                               1 + mutation_factor),
-                          HUMAN_PARAMS['speed'][0] * 0.8,
-                          HUMAN_PARAMS['speed'][1] * 1.2)),
-            3
-        )
-        child['jump'] = round(
-            float(np.clip((ind1['jump'] + ind2['jump']) / 2 * random.uniform(1 - mutation_factor,
-                                                                             1 + mutation_factor),
-                          HUMAN_PARAMS['jump'][0] * 0.8,
-                          HUMAN_PARAMS['jump'][1] * 1.2)),
-            3
-        )
-        child['strength'] = round(
-            float(np.clip((ind1['strength'] + ind2['strength']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                     1 + mutation_factor),
-                          HUMAN_PARAMS['strength'][0] * 0.8,
-                          HUMAN_PARAMS['strength'][1] * 1.2)),
-            3
-        )
-        child['arm_length'] = round(
-            float(np.clip((ind1['arm_length'] + ind2['arm_length']) / 2 * random.uniform(1 - mutation_factor,
-                                                                                         1 + mutation_factor),
-                          HUMAN_PARAMS['arm_length'][0] * 0.8,
-                          HUMAN_PARAMS['arm_length'][1] * 1.2)),
-            3
-        )
-        child['skin_thickness'] = round(
-            float(np.clip(
-                (ind1['skin_thickness'] + ind2['skin_thickness']) / 2 * random.uniform(1 - mutation_factor,
+        for parameter in ['height', 'speed', 'jump', 'strength', 'arm_length', 'skin_thickness']:
+            child[parameter] = round(
+                float(np.clip((ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
                                                                                        1 + mutation_factor),
-                HUMAN_PARAMS['skin_thickness'][0] * 0.8,
-                HUMAN_PARAMS['skin_thickness'][1] * 1.2)),
-            3
-        )
+                              HUMAN_PARAMS[parameter][0] * 0.8,
+                              HUMAN_PARAMS[parameter][1] * 1.2)),
+                3
+            )
     else:
-        for param, value in ind1.items():
-            if param != '_id' and param != 'age' and param != 'value':
-                child[param] = round(
+        for parameter, value in ind1.items():
+            if parameter != '_id' and parameter != 'age' and parameter != 'value':
+                child[parameter] = round(
                     float(np.clip(
-                        (ind1[param] + ind2[param]) / 2 * random.uniform(1 - mutation_factor,
-                                                                         1 + mutation_factor),
-                        GENERIC_PARAMS[param][0] * 0.8,
-                        GENERIC_PARAMS[param][1] * 1.2)),
+                        (ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
+                                                                                 1 + mutation_factor),
+                        GENERIC_PARAMS[parameter][0] * 0.8,
+                        GENERIC_PARAMS[parameter][1] * 1.2)),
                     3
                 )
     child['value'] = 0

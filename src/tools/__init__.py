@@ -1,3 +1,4 @@
+import sys
 from src.tools.plot import PlotWrapper
 
 
@@ -17,6 +18,9 @@ def set_db(to_activate=None, environment=None):
             my_data_wrapper = DataWrapper(db=to_activate, params=MYSQL_PARAMS, environment=environment)
         elif to_activate.lower() == 'no db':
             my_data_wrapper = DataWrapper()
+        else:
+            print("Choose one of the available DB")
+            sys.exit()
     else:
         my_data_wrapper = DataWrapper()
 
