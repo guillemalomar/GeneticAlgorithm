@@ -18,8 +18,8 @@ def create_individuals(environment_name):
     current_population = return_db()
     for index in range(0, get_population_size()):
         params = obtain_params(index)
-        current_population['{}_{}'.format(environment_name, 1)].append(params)
-    logging.debug("Created a starting set of {} individuals".format(get_population_size()))
+        current_population[f'{environment_name}_{1}'].append(params)
+    logging.debug(f"Created a starting set of {get_population_size()} individuals")
     return current_population
 
 

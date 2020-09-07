@@ -48,7 +48,7 @@ class ReproduceTests(unittest.TestCase):
         _ = asyncio.run(self.async_obtain_children(0, 1))
 
     async def async_obtain_children(self, indiv1_ind, indiv2_ind):
-        set_db("Not defined")
+        set_db()
         rand_idx = random.randint(0, get_population_size())
         rand_iter = random.randint(0, get_population_size())
 
@@ -93,7 +93,7 @@ class ReproduceTests(unittest.TestCase):
             'jump': indiv2_jump,
             'skin_thickness': indiv2_skin_thickness
         }
-        current_population = DataWrapper("Not defined")
+        current_population = DataWrapper()
         current_population["test_pop"] = [indiv1, indiv2]
         new_child = [
             asyncio.ensure_future(

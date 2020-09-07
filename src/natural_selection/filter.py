@@ -19,7 +19,7 @@ def filter_individuals(current_population, environment, iteration):
     :return: resulting set of individuals after filtering stage
     :rtype: list or DBWrapper
     """
-    filtered_collection = '{}_{}_{}'.format(environment.name, iteration, 'filtered')
+    filtered_collection = f'{environment.name}_{iteration}_{"filtered"}'
     _ = asyncio.run(create_evaluation_tasks(current_population, environment, iteration))
     current_population[filtered_collection].sort(key=operator.itemgetter('value'), reverse=True)
     deleted = 0
@@ -27,7 +27,7 @@ def filter_individuals(current_population, environment, iteration):
         if idx < int(get_population_size() * 0.4):
             current_population[filtered_collection].pop(get_population_size() - idx - 1)
             deleted += 1
-    logging.debug("Deleted {} individuals".format(int(get_population_size() * 0.4)))
+    logging.debug(f"Deleted {int(get_population_size() * 0.4)} individuals")
     return current_population
 
 
@@ -65,7 +65,7 @@ async def evaluate_individual(current_population, individual_id, environment, it
     :return: pair of individual with its value
     :rtype: tuple
     """
-    base_coll_name = '{}_{}'.format(environment.name, iteration)
+    base_coll_name = f'{environment.name}_{iteration}'
     individual = current_population[base_coll_name][individual_id]
     if not is_generic():
         individual_value = human_value_function(individual, environment.data)
@@ -76,7 +76,7 @@ async def evaluate_individual(current_population, individual_id, environment, it
         individual_value = generic_value_function(individual, environment.data)
         individual_value = generic_penalize_extremes(individual, individual_value, environment.data)
     individual['value'] = individual_value
-    current_population['{}_{}_{}'.format(environment.name, iteration, 'filtered')].append(individual)
+    current_population[f'{environment.name}_{iteration}_{"filtered"}'].append(individual)
     return individual_value
 
 
@@ -297,20 +297,8 @@ def show_best_and_worst_fitting(current_population, environment_name, iteration)
     :param iteration: current iteration
     :type iteration: int
     """
-    coll_name = '{}_{}'.format(environment_name, iteration)
-    print("Worst individual in iteration {}: {}".format(
-        iteration,
-        current_population[coll_name][int(get_population_size() * 0.6) - 1])
-    )
-    logging.info("Worst individual in iteration {}: {}".format(
-        iteration,
-        current_population[coll_name][int(get_population_size() * 0.6) - 1])
-    )
-    print("Best individual in iteration {}:  {}".format(
-        iteration,
-        current_population[coll_name][0])
-    )
-    logging.info("Best individual in iteration {}:  {}".format(
-        iteration,
-        current_population[coll_name][0])
-    )
+    coll_name = f'{environment_name}_{iteration}'
+    print(f"Worst individual in iteration {iteration}: {current_population[coll_name][int(get_population_size() * 0.6) - 1]}")
+    logging.info(f"Worst individual in iteration {iteration}: {current_population[coll_name][int(get_population_size() * 0.6) - 1]}")
+    print(f"Best individual in iteration {iteration}:  {current_population[coll_name][0]}")
+    logging.info(f"Best individual in iteration {iteration}:  {current_population[coll_name][0]}")

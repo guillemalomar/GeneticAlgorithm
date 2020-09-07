@@ -44,7 +44,7 @@ class MysqlDbWrapper:
 
     def use_database(self, db_name):
         try:
-            self.cursor.execute('USE  {}'.format(db_name))
+            self.cursor.execute(f'USE {db_name}')
             logging.debug(MYSQL_MESSAGES["MYSQL_USE_SUCC"].format(db_name))
         except Exception as exc:
             logging.error(MYSQL_MESSAGES["MYSQL_USE_ERR"].format(db_name, exc))

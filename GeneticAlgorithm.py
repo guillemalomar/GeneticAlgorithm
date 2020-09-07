@@ -29,7 +29,7 @@ def execute_genetic_algorithm(maximum_iterations, environment):
     logging.info(MESSAGES["ITERATION_STAGE"])
     iterate(maximum_iterations, initial_population, environment)
     logging.info(MESSAGES["CLOSING_STAGE"])
-    my_plot.save_results('{}'.format(environment.name))
+    my_plot.save_results(f'{environment.name}')
     my_plot.__init__()
 
 

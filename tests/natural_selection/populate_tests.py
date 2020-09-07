@@ -9,7 +9,7 @@ from src.tools import set_db
 class PopulateTests(unittest.TestCase):
 
     def test_create_individuals(self):
-        set_db("Not defined")
+        set_db()
         self.assertEqual(len(create_individuals('bla')['bla_1']), get_population_size())
 
     def test_obtain_params(self):

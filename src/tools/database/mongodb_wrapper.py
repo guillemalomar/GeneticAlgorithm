@@ -62,28 +62,27 @@ class MongodbDbWrapper:
 
     def create_collection(self, collection_name):
         try:
-            self.collections['{}'.format(collection_name)] = \
-                MongodbCollectionWrapper('{}'.format(collection_name),
-                                         self.db['{}'.format(collection_name)])
+            self.collections['{collection_name}'] = \
+                MongodbCollectionWrapper(f'{collection_name}', self.db[f'{collection_name}'])
             logging.debug(MONGO_MESSAGES["MONGODB_SUCC_CRE_COLL"].format(collection_name))
         except Exception as exc:
             logging.error(MONGO_MESSAGES["MONGODB_ERR_CRE_COLL"].format(collection_name, exc))
 
     def delete_collection(self, collection_name):
         try:
-            self.collections['{}'.format(collection_name)].drop()
+            self.collections[f'{collection_name}'].drop()
             logging.debug(MONGO_MESSAGES["MONGODB_SUCC_DEL_COLL"].format(collection_name))
         except Exception as exc:
             logging.error(MONGO_MESSAGES["MONGODB_ERR_DEL_COLL".format(collection_name, exc)])
 
     def insert_document(self, collection_name, document):
-        self.collections['{}'.format(collection_name)].insert_one(document)
+        self.collections[f'{collection_name}'].insert_one(document)
 
     def insert_documents(self, collection_name, documents):
-        self.collections['{}'.format(collection_name)].insert_many(documents)
+        self.collections[f'{collection_name}'].insert_many(documents)
 
     def obtain_all_documents(self, collection_name):
-        return self.collections['{}'.format(collection_name)].find({})
+        return self.collections[f'{collection_name}'].find({})
 
     def __setitem__(self, key, value):
         if key not in self.collections:
@@ -94,7 +93,7 @@ class MongodbDbWrapper:
         if collection_name not in self.collections:
             self.collections[collection_name] = MongodbCollectionWrapper(
                 collection_name,
-                self.db['{}'.format(collection_name)]
+                self.db[f'{collection_name}']
             )
         return self.collections[collection_name]
 

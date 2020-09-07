@@ -34,7 +34,7 @@ class PopulationAnalysis:
         :param iteration: current iteration
         :type iteration: int
         """
-        coll_name = '{}_{}'.format(environment_name, iteration + 1)
+        coll_name = f'{environment_name}_{iteration + 1}'
         if not is_generic():
             total_speed = 0
             total_strength = 0

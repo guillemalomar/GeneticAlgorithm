@@ -5,8 +5,8 @@
 [logo5]: documentation/Evolution.png?style=centerme "Header"
 
 *    Author: Guillem Alomar      
-*    Current release: August 5th, 2019                     
-*    Code version: 1.0                      
+*    Current release: September 7th, 2020                    
+*    Code version: 1.1                      
 *    Availability: Public
 
 ## Index
