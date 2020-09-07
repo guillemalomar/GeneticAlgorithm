@@ -10,8 +10,8 @@ def show_about():
 def execution_message(environment):
     exec_message = 20 * "#" + " NEW EXECUTION " + 20 * "#" + "\n" + \
                    33*"#" + " Executing with the following parameters:\n" +\
-                   33*"#" + " Environment name: {}\n".format(environment.name) + 33*"#" + " -" +\
+                   33*"#" + f" Environment name: {environment.name}\n" + 33*"#" + " -" +\
                    "\n################################# -".join(
-                       ['{}: {}'.format(key, value) for key, value in environment.data.items()])
+                       [f'{key}: {value}' for key, value in environment.data.items()])
     print(exec_message)
     logging.info(exec_message)

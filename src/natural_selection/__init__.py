@@ -37,9 +37,9 @@ def iterate(max_iterations, current_population, environment):
 
         current_population = natural_death(iteration, current_population, environment.name)
 
-        del current_population['{}_{}'.format(environment.name, iteration)]
-        del current_population['{}_{}_filtered'.format(environment.name, iteration)]
-        del current_population['{}_{}_reproduction'.format(environment.name, iteration)]
+        del current_population[f'{environment.name}_{iteration}']
+        del current_population[f'{environment.name}_{iteration}_filtered']
+        del current_population[f'{environment.name}_{iteration}_reproduction']
 
         new_analysis = PopulationAnalysis(environment.data, iteration)
         new_analysis.analyze_population(current_population, environment.name, iteration)
@@ -49,7 +49,7 @@ def iterate(max_iterations, current_population, environment):
             break
         prev_analysis = new_analysis
 
-    logging.info("Total number of iterations: {}".format(iteration))
-    print("Total number of iterations: {}".format(iteration))
+    logging.info(f"Total number of iterations: {iteration}")
+    print(f"Total number of iterations: {iteration}")
     iteration = 0
     return current_population

@@ -20,8 +20,8 @@ def reproduction_stage(iteration, current_population, environment_name):
     :return: resulting set of individuals after reproduction stage
     :rtype: list or DBWrapper
     """
-    filtered_coll = '{}_{}_filtered'.format(environment_name, iteration)
-    reproduce_coll = '{}_{}_reproduction'.format(environment_name, iteration)
+    filtered_coll = f'{environment_name}_{iteration}_filtered'
+    reproduce_coll = f'{environment_name}_{iteration}_reproduction'
     if is_elitist():
         individuals_pairs = obtain_randomized_pairs(int(get_population_size() * 0.6))
     else:
@@ -35,7 +35,7 @@ def reproduction_stage(iteration, current_population, environment_name):
                                                              individuals_pairs,
                                                              iteration,
                                                              filtered_coll))
-    logging.debug("Created {} new individuals".format(len(newly_created_individuals)))
+    logging.debug(f"Created {len(newly_created_individuals)} new individuals")
     current_population[reproduce_coll].extend(new_iter_individuals)
     return current_population
 
@@ -186,6 +186,6 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
                 3
             )
     child['value'] = 0
-    reproduction_collection = '{}_{}'.format('_'.join(filtered_coll.split('_')[:-1]), 'reproduction')
+    reproduction_collection = f'{"_".join(filtered_coll.split("_")[:-1])}_{"reproduction"}'
     current_population[reproduction_collection].append(child)
     return index

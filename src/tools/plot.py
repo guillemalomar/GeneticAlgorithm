@@ -61,13 +61,13 @@ class PlotWrapper:
             self.ax2.axhline(y=environment['food_animals_strength'], c="blue", linewidth=0.5, zorder=0)
             self.ax3.axhline(y=temp_threshold, c="blue", linewidth=0.5, zorder=0)
             self.ax4.axhline(y=environment['tree_height'], c="blue", linewidth=0.5, zorder=0)
-            environment_params = '\n'.join(['{}: {}'.format(key, value) for key, value in environment.items()])
+            environment_params = '\n'.join([f'{key}: {value}' for key, value in environment.items()])
             self.ax6.text(0.2, 0.5, environment_params, horizontalalignment='left', verticalalignment='center', size=15)
             self.ax6.axis('off')
         else:
             for key in environment.keys():
                 self.__getattribute__(key).axhline(y=environment[key], c="red", linewidth=0.5, zorder=0)
-            environment_params = '\n'.join(['{}: {}'.format(key, value) for key, value in environment.items()])
+            environment_params = '\n'.join([f'{key}: {value}' for key, value in environment.items()])
             self.data.text(0.2, 0.5, environment_params, horizontalalignment='left', verticalalignment='center', size=15)
             self.data.axis('off')
 
@@ -98,5 +98,5 @@ class PlotWrapper:
         :type plot_name: str
         """
         self.fig.suptitle(plot_name, fontsize=20)
-        plt.savefig("output/{}.png".format(plot_name), transparent=False)
-        logging.info("Results saved in the following file: output/{}.png".format(plot_name))
+        plt.savefig(f"output/{plot_name}.png", transparent=False)
+        logging.info(f"Results saved in the following file: output/{plot_name}.png")

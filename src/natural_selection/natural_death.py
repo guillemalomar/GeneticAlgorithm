@@ -15,8 +15,8 @@ def natural_death(iteration, current_population, environment_name):
     :return: the individuals that survived the filtering stage
     :rtype: list or DBWrapper
     """
-    coll_to_trim = current_population['{}_{}_{}'.format(environment_name, iteration, 'reproduction')]
-    new_col = current_population['{}_{}'.format(environment_name, iteration + 1)]
+    coll_to_trim = current_population[f'{environment_name}_{iteration}_{"reproduction"}']
+    new_col = current_population[f'{environment_name}_{iteration + 1}']
     coll_to_trim.sort(key=operator.itemgetter('age'), reverse=True)
     for idx, individual in enumerate(coll_to_trim):
         if idx < get_population_size():
