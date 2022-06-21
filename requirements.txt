@@ -1,6 +1,6 @@
 asyncio==3.4.3
 matplotlib==3.3.1
-numpy==1.16.4
+numpy==1.22.0
 pytest==5.0.1
 mysql-connector-python==8.0.14
 mysql-connector-python-rf==2.2.2
