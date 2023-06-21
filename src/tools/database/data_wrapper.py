@@ -6,11 +6,11 @@ from src.tools.database.settings import MESSAGES
 class DataWrapper:
     def __init__(self, db=None, params=None, environment=None):
         if db:
-            if db.lower() == 'mongodb':
+            if db.lower() == "mongodb":
                 from src.tools.database.mongodb_wrapper import MongodbDbWrapper
                 self.db = True
                 self.my_data = MongodbDbWrapper(params)
-            elif db.lower() == 'mysql':
+            elif db.lower() == "mysql":
                 from src.tools.database.mysql_wrapper import MysqlDbWrapper
                 self.db = True
                 self.my_data = MysqlDbWrapper(params, environment)

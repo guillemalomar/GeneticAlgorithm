@@ -2,8 +2,8 @@ import asyncio
 import logging
 import operator
 
-from settings.human_model import HUMAN_WEIGHTS
 from settings.generic_model import GENERIC_WEIGHTS
+from settings.human_model import HUMAN_WEIGHTS
 from src import is_generic, get_population_size
 
 
@@ -19,9 +19,9 @@ def filter_individuals(current_population, environment, iteration):
     :return: resulting set of individuals after filtering stage
     :rtype: list or DBWrapper
     """
-    filtered_collection = f'{environment.name}_{iteration}_{"filtered"}'
+    filtered_collection = f"{environment.name}_{iteration}_filtered"
     _ = asyncio.run(create_evaluation_tasks(current_population, environment, iteration))
-    current_population[filtered_collection].sort(key=operator.itemgetter('value'), reverse=True)
+    current_population[filtered_collection].sort(key=operator.itemgetter("value"), reverse=True)
     deleted = 0
     for idx, item in enumerate(current_population[filtered_collection]):
         if idx < int(get_population_size() * 0.4):
@@ -65,7 +65,7 @@ async def evaluate_individual(current_population, individual_id, environment, it
     :return: pair of individual with its value
     :rtype: tuple
     """
-    base_coll_name = f'{environment.name}_{iteration}'
+    base_coll_name = f"{environment.name}_{iteration}"
     individual = current_population[base_coll_name][individual_id]
     if not is_generic():
         individual_value = human_value_function(individual, environment.data)
@@ -75,8 +75,8 @@ async def evaluate_individual(current_population, individual_id, environment, it
     else:
         individual_value = generic_value_function(individual, environment.data)
         individual_value = generic_penalize_extremes(individual, individual_value, environment.data)
-    individual['value'] = individual_value
-    current_population[f'{environment.name}_{iteration}_{"filtered"}'].append(individual)
+    individual["value"] = individual_value
+    current_population[f"{environment.name}_{iteration}_filtered"].append(individual)
     return individual_value
 
 
@@ -90,18 +90,15 @@ def generic_value_function(individual, environment):
     :return: evaluation result
     :rtype: float
     """
-    total_value = 0
-    for param, value in individual.items():
-        if param != '_id' and param != 'age' and param != 'value':
-            total_value += GENERIC_WEIGHTS[param] * min(value / environment[param], 1)
-    return total_value
+    return sum([GENERIC_WEIGHTS[param] * min(value / environment[param], 1)
+                if param not in ["_id", "age", "value"] else 0
+                for param, value in individual.items()])
 
 
 def generic_penalize_extremes(individual, total_value, environment):
     for param, value in individual.items():
-        if param != '_id' and param != 'age' and param != 'value':
-            if value / environment[param] > 1.2:
-                total_value = total_value * 0.5
+        if param not in ["_id", "age", "value"] and value / environment[param] > 1.2:
+            total_value = total_value * 0.5
     return total_value
 
 
@@ -115,16 +112,16 @@ def human_value_function(individual, environment):
     :return: evaluation result
     :rtype: float
     """
-    skin_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
-    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
+    skin_threshold = 0.05 + (abs(environment["temperature"] - 20) * 0.01)
+    total_reach = individual["height"] + individual["arm_length"] + individual["jump"]
 
     total_value = 0
-    total_value += (HUMAN_WEIGHTS['height'] +
-                    HUMAN_WEIGHTS['jump'] +
-                    HUMAN_WEIGHTS['arm_length']) * min(total_reach / environment['tree_height'], 1)
-    total_value += HUMAN_WEIGHTS['strength'] * min(individual['strength'] / environment['food_animals_strength'], 1)
-    total_value += HUMAN_WEIGHTS['speed'] * min(individual['speed'] / environment['predators_speed'], 1)
-    total_value += HUMAN_WEIGHTS['skin_thickness'] * min(individual['skin_thickness'] / skin_threshold, 1)
+    total_value += (HUMAN_WEIGHTS["height"] +
+                    HUMAN_WEIGHTS["jump"] +
+                    HUMAN_WEIGHTS["arm_length"]) * min(total_reach / environment["tree_height"], 1)
+    total_value += HUMAN_WEIGHTS["strength"] * min(individual["strength"] / environment["food_animals_strength"], 1)
+    total_value += HUMAN_WEIGHTS["speed"] * min(individual["speed"] / environment["predators_speed"], 1)
+    total_value += HUMAN_WEIGHTS["skin_thickness"] * min(individual["skin_thickness"] / skin_threshold, 1)
     return total_value
 
 
@@ -141,14 +138,14 @@ def human_penalize_extremes(individual, total_value, environment):
     :return: new evaluation for the individual
     :rtype: float
     """
-    skin_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
-    ind_speed_vs_predator = individual['speed'] / environment['predators_speed']
-    ind_speed_vs_food = individual['speed'] / environment['food_animals_speed']
-    ind_strength_vs_food = individual['strength'] / environment['food_animals_strength']
-    ind_skin_vs_temp = individual['skin_thickness'] / skin_threshold
-    ind_reach_vs_trees = (individual['height'] +
-                          individual['jump'] +
-                          individual['arm_length']) / environment['tree_height']
+    skin_threshold = 0.05 + abs(environment["temperature"] - 20) * 0.01
+    ind_speed_vs_predator = individual["speed"] / environment["predators_speed"]
+    ind_speed_vs_food = individual["speed"] / environment["food_animals_speed"]
+    ind_strength_vs_food = individual["strength"] / environment["food_animals_strength"]
+    ind_skin_vs_temp = individual["skin_thickness"] / skin_threshold
+    ind_reach_vs_trees = (individual["height"] +
+                          individual["jump"] +
+                          individual["arm_length"]) / environment["tree_height"]
 
     if ind_reach_vs_trees > 1.1:
         total_value = total_value * 0.5
@@ -160,7 +157,7 @@ def human_penalize_extremes(individual, total_value, environment):
         total_value = total_value * 0.5
 
     if ind_speed_vs_food > 1.1 and \
-       ind_speed_vs_predator >= 1.0:
+            ind_speed_vs_predator >= 1.0:
         total_value = total_value * 0.5
 
     if ind_speed_vs_predator > 1.1:
@@ -174,7 +171,7 @@ def human_penalize_extremes(individual, total_value, environment):
 
 def evaluate_fast_enough(individual, total_value, environment):
     """
-    Check if the individual's speed is high enough to scape from predators. Otherwise give a big penalization.
+    Check if the individual's speed is high enough to scape from predators. Otherwise, give a big penalization.
     :param individual: current individual parameters
     :type individual: dict
     :param total_value: current evaluation for the individual
@@ -184,14 +181,12 @@ def evaluate_fast_enough(individual, total_value, environment):
     :return: new evaluation for the individual
     :rtype: float
     """
-    if not is_fast_enough(individual, environment):
-        total_value = total_value * 0.2
-    return total_value
+    return total_value if is_fast_enough(individual, environment) else total_value * 0.2
 
 
 def evaluate_warm_enough(individual, total_value, environment):
     """
-    Check if the individual's skin is thick enough. Otherwise give a big penalization.
+    Check if the individual's skin is thick enough. Otherwise, give a big penalization.
     :param individual: current individual parameters
     :type individual: dict
     :param total_value: current evaluation for the individual
@@ -201,9 +196,7 @@ def evaluate_warm_enough(individual, total_value, environment):
     :return: new evaluation for the individual
     :rtype: float
     """
-    if not is_warm_enough(individual, environment):
-        total_value = total_value * 0.2
-    return total_value
+    return total_value if is_warm_enough(individual, environment) else total_value * 0.2
 
 
 def is_fast_enough(individual, environment):
@@ -216,9 +209,7 @@ def is_fast_enough(individual, environment):
     :return: true if the individual is fast enough to scape from its predators. false otherwise.
     :rtype: bool
     """
-    if individual['speed'] < environment['predators_speed']:
-        return False
-    return True
+    return individual["speed"] >= environment["predators_speed"]
 
 
 def is_strong_enough(individual, environment):
@@ -231,9 +222,7 @@ def is_strong_enough(individual, environment):
     :return: true if the individual is strong enough to kill food animals. false otherwise.
     :rtype: bool
     """
-    if individual['strength'] <= environment['food_animals_strength']:
-        return False
-    return True
+    return individual["strength"] > environment["food_animals_strength"]
 
 
 def is_warm_enough(individual, environment):
@@ -246,10 +235,8 @@ def is_warm_enough(individual, environment):
     :return: true if the individual skin fits the environment temperature. false otherwise.
     :rtype: bool
     """
-    temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
-    if individual['skin_thickness'] < temp_threshold:
-        return False
-    return True
+    temp_threshold = 0.05 + (abs(environment["temperature"] - 20) * 0.01)
+    return individual["skin_thickness"] > temp_threshold
 
 
 def is_food_accessible(individual, environment):
@@ -262,13 +249,21 @@ def is_food_accessible(individual, environment):
     :return: true if the individual has a way of finding food. false otherwise.
     :rtype: bool
     """
-    if ((individual['height'] +
-         individual['jump'] +
-         individual['arm_length']) < environment['tree_height']) or \
-        (individual['speed'] <= environment['food_animals_speed'] and
-         individual['strength'] <= environment['food_animals_strength']):
-        return False
-    return True
+    return is_tall_enough(individual, environment) or is_fast_and_strong_enough(individual, environment)
+
+
+def is_fast_and_strong_enough(individual, environment):
+    """
+    This method checks if the individual can catch its preys and is strong enough to kill them.
+    :param individual: current individual parameters
+    :type individual: dict
+    :param environment: the current parameters against which the individuals are being tested
+    :type environment: dict
+    :return: true if the individual can hunt for food. false otherwise.
+    :rtype: bool
+    """
+    return individual["speed"] > environment["food_animals_speed"] and \
+        individual["strength"] > environment["food_animals_strength"]
 
 
 def is_tall_enough(individual, environment):
@@ -278,13 +273,10 @@ def is_tall_enough(individual, environment):
     :type individual: dict
     :param environment: the current parameters against which the individuals are being tested
     :type environment: dict
-    :return: true if the individual can arrive to tree's food. false otherwise.
+    :return: true if the individual can reach tree's food. false otherwise.
     :rtype: bool
     """
-    total_reach = individual['height'] + individual['arm_length'] + individual['jump']
-    if total_reach < environment['tree_height']:
-        return False
-    return True
+    return individual["height"] + individual["arm_length"] + individual["jump"] >= environment["tree_height"]
 
 
 def show_best_and_worst_fitting(current_population, environment_name, iteration):
@@ -297,8 +289,7 @@ def show_best_and_worst_fitting(current_population, environment_name, iteration)
     :param iteration: current iteration
     :type iteration: int
     """
-    coll_name = f'{environment_name}_{iteration}'
-    print(f"Worst individual in iteration {iteration}: {current_population[coll_name][int(get_population_size() * 0.6) - 1]}")
-    logging.info(f"Worst individual in iteration {iteration}: {current_population[coll_name][int(get_population_size() * 0.6) - 1]}")
-    print(f"Best individual in iteration {iteration}:  {current_population[coll_name][0]}")
-    logging.info(f"Best individual in iteration {iteration}:  {current_population[coll_name][0]}")
+    coll_name = f"{environment_name}_{iteration}"
+    population = current_population[coll_name]
+    logging.info(f"Worst individual in iteration {iteration}: {population[int(get_population_size() * 0.6) - 1]}")
+    logging.info(f"Best individual in iteration {iteration}:  {population[0]}")

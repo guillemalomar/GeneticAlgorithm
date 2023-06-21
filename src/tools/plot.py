@@ -9,23 +9,31 @@ from src import is_generic, get_population_size
 class PlotWrapper:
     def __init__(self):
         self.fig = plt.figure(figsize=(12, 9))
+        self.data = None
+        self.fitting = None
+        self.ax1 = None
+        self.ax2 = None
+        self.ax3 = None
+        self.ax4 = None
+        self.ax5 = None
+        self.ax6 = None
 
     def set_plots(self, environment):
         if not is_generic():
             self.ax1 = self.fig.add_subplot(3, 2, 1)
-            self.ax1.set_title('Average Speed')
-            self.ax1.set_ylim([HUMAN_PARAMS['speed'][0] * 0.8, HUMAN_PARAMS['speed'][1] * 1.2])
+            self.ax1.set_title("Average Speed")
+            self.ax1.set_ylim([HUMAN_PARAMS["speed"][0] * 0.8, HUMAN_PARAMS["speed"][1] * 1.2])
             self.ax2 = self.fig.add_subplot(3, 2, 2)
-            self.ax2.set_title('Average Strength')
-            self.ax2.set_ylim([HUMAN_PARAMS['strength'][0] * 0.8, HUMAN_PARAMS['strength'][1] * 1.2])
+            self.ax2.set_title("Average Strength")
+            self.ax2.set_ylim([HUMAN_PARAMS["strength"][0] * 0.8, HUMAN_PARAMS["strength"][1] * 1.2])
             self.ax3 = self.fig.add_subplot(3, 2, 3)
-            self.ax3.set_title('Average Skin thickness')
-            self.ax3.set_ylim([HUMAN_PARAMS['skin_thickness'][0] * 0.8, HUMAN_PARAMS['skin_thickness'][1] * 1.2])
+            self.ax3.set_title("Average Skin thickness")
+            self.ax3.set_ylim([HUMAN_PARAMS["skin_thickness"][0] * 0.8, HUMAN_PARAMS["skin_thickness"][1] * 1.2])
             self.ax4 = self.fig.add_subplot(3, 2, 4)
-            self.ax4.set_title('Average Total Reach')
+            self.ax4.set_title("Average Total Reach")
             self.ax4.set_ylim([1*0.8, 2.5*1.2])
             self.ax5 = self.fig.add_subplot(3, 2, 5)
-            self.ax5.set_title('Individuals fitting')
+            self.ax5.set_title("Individuals fitting")
             self.ax5.set_ylim([(get_population_size() * 0.9) - get_population_size(), get_population_size()*1.1])
             self.ax6 = self.fig.add_subplot(3, 2, 6)
         else:
@@ -39,7 +47,7 @@ class PlotWrapper:
                 self.__getattribute__(key).set_ylim([GENERIC_PARAMS[key][0] * 0.8, GENERIC_PARAMS[key][1] * 1.2])
                 ind += 1
             self.fitting = self.fig.add_subplot(num_rows, num_cols, ind)
-            self.fitting.set_title('Individuals fitting')
+            self.fitting.set_title("Individuals fitting")
             self.fitting.set_ylim([(get_population_size() * 0.9) - get_population_size(), get_population_size()*1.1])
             self.data = self.fig.add_subplot(num_rows, num_cols, ind + 1)
 
@@ -49,27 +57,27 @@ class PlotWrapper:
 
     def add_limits(self, environment):
         """
-        This method is used to add some horizontal axis's to the plots to understand better if the results
+        This method is used to add some horizontal axis to the plots to understand better if the results
         make sens.
         :param environment: the current parameters against which the individuals are being tested
         :type environment: dict
         """
         if not is_generic():
-            temp_threshold = 0.05 + (abs(environment['temperature'] - 20) * (0.30 / 30))
-            self.ax1.axhline(y=environment['predators_speed'], c="red", linewidth=0.5, zorder=0)
-            self.ax1.axhline(y=environment['food_animals_speed'], c="blue", linewidth=0.5, zorder=0)
-            self.ax2.axhline(y=environment['food_animals_strength'], c="blue", linewidth=0.5, zorder=0)
+            temp_threshold = 0.05 + (abs(environment["temperature"] - 20) * (0.30 / 30))
+            self.ax1.axhline(y=environment["predators_speed"], c="red", linewidth=0.5, zorder=0)
+            self.ax1.axhline(y=environment["food_animals_speed"], c="blue", linewidth=0.5, zorder=0)
+            self.ax2.axhline(y=environment["food_animals_strength"], c="blue", linewidth=0.5, zorder=0)
             self.ax3.axhline(y=temp_threshold, c="blue", linewidth=0.5, zorder=0)
-            self.ax4.axhline(y=environment['tree_height'], c="blue", linewidth=0.5, zorder=0)
-            environment_params = '\n'.join([f'{key}: {value}' for key, value in environment.items()])
-            self.ax6.text(0.2, 0.5, environment_params, horizontalalignment='left', verticalalignment='center', size=15)
-            self.ax6.axis('off')
+            self.ax4.axhline(y=environment["tree_height"], c="blue", linewidth=0.5, zorder=0)
+            environment_params = "\n".join([f"{key}: {value}" for key, value in environment.items()])
+            self.ax6.text(0.2, 0.5, environment_params, horizontalalignment="left", verticalalignment="center", size=15)
+            self.ax6.axis("off")
         else:
             for key in environment.keys():
                 self.__getattribute__(key).axhline(y=environment[key], c="red", linewidth=0.5, zorder=0)
-            environment_params = '\n'.join([f'{key}: {value}' for key, value in environment.items()])
-            self.data.text(0.2, 0.5, environment_params, horizontalalignment='left', verticalalignment='center', size=15)
-            self.data.axis('off')
+            environment_params = "\n".join([f"{key}: {value}" for key, value in environment.items()])
+            self.data.text(0.2, 0.5, environment_params, horizontalalignment="left", verticalalignment="center", size=15)
+            self.data.axis("off")
 
     def add_data(self, results, iteration):
         """
@@ -80,16 +88,16 @@ class PlotWrapper:
         :type iteration: int
         """
         if not is_generic():
-            self.ax1.scatter(iteration, results['speed'], color='r', s=3)
-            self.ax2.scatter(iteration, results['strength'], color='g', s=3)
-            self.ax3.scatter(iteration, results['skin'], color='b', s=3)
-            self.ax4.scatter(iteration, results['total_reach'], color='c', s=3)
-            self.ax5.scatter(iteration, results['fitting'], color='k', s=3)
+            self.ax1.scatter(iteration, results["speed"], color="r", s=3)
+            self.ax2.scatter(iteration, results["strength"], color="g", s=3)
+            self.ax3.scatter(iteration, results["skin"], color="b", s=3)
+            self.ax4.scatter(iteration, results["total_reach"], color="c", s=3)
+            self.ax5.scatter(iteration, results["fitting"], color="k", s=3)
         else:
             for key, val in results.items():
-                if key != 'value' and key != 'age' and key != '_id':
-                    self.__getattribute__(key).scatter(iteration, results[key], color='r', s=3)
-            self.fitting.scatter(iteration, results['fitting'], color='k', s=3)
+                if key not in ["value", "age", "_id"]:
+                    self.__getattribute__(key).scatter(iteration, results[key], color="r", s=3)
+            self.fitting.scatter(iteration, results["fitting"], color="k", s=3)
 
     def save_results(self, plot_name):
         """

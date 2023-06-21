@@ -20,16 +20,14 @@ def reproduction_stage(iteration, current_population, environment_name):
     :return: resulting set of individuals after reproduction stage
     :rtype: list or DBWrapper
     """
-    filtered_coll = f'{environment_name}_{iteration}_filtered'
-    reproduce_coll = f'{environment_name}_{iteration}_reproduction'
-    if is_elitist():
-        individuals_pairs = obtain_randomized_pairs(int(get_population_size() * 0.6))
-    else:
-        individuals_pairs = obtain_ordered_pairs(int(get_population_size() * 0.6))
+    filtered_coll = f"{environment_name}_{iteration}_filtered"
+    reproduce_coll = f"{environment_name}_{iteration}_reproduction"
+    individuals_pairs = obtain_randomized_pairs(int(get_population_size() * 0.6)) if is_elitist() \
+        else obtain_ordered_pairs(int(get_population_size() * 0.6))
     new_iter_individuals = obtain_pairs_of_individuals(
         current_population,
         individuals_pairs,
-        filtered_coll
+        filtered_coll,
     )
     newly_created_individuals = asyncio.run(pair_individuals(current_population,
                                                              individuals_pairs,
@@ -87,7 +85,7 @@ def mongo_obtain_pairs_of_individuals(current_population, filtered_population, i
     for index, individual_pair in enumerate(individuals_pairs):
         for index2, step in enumerate([0, int(get_population_size() * 0.3)]):
             individual = filtered_population[individual_pair[index2]]
-            individual['_id'] = index
+            individual["_id"] = index
             current_population.current_collection.insert_one(individual)
     return individuals_pairs
 
@@ -107,17 +105,17 @@ def obtain_pairs_of_individuals(current_population, individuals_pairs, filtered_
     new_iter_individuals = []
     for index, individual_pair in enumerate(individuals_pairs):
         ind1 = current_population[filtered_coll][individual_pair[0]]
-        ind1['_id'] = index
+        ind1["_id"] = index
         new_iter_individuals.append(ind1)
         ind2 = current_population[filtered_coll][individual_pair[1]]
-        ind2['_id'] = index + int(get_population_size() * 0.3)
+        ind2["_id"] = index + int(get_population_size() * 0.3)
         new_iter_individuals.append(ind2)
     return new_iter_individuals
 
 
 async def pair_individuals(current_population, list_of_pairs, iteration, filtered_coll):
     """
-    This method creates the asynchronous tasks to obtain two childs for each pair of parents
+    This method creates the asynchronous tasks to obtain two children for each pair of parents
     :param current_population: individuals to reproduce
     :type current_population: list or DBWrapper
     :param list_of_pairs: list of randomized pairs
@@ -139,7 +137,7 @@ async def pair_individuals(current_population, list_of_pairs, iteration, filtere
                                     pair[0],
                                     pair[1],
                                     current_population,
-                                    filtered_coll
+                                    filtered_coll,
                                     )
                 )
             )
@@ -168,24 +166,23 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
     """
     ind1 = current_population[filtered_coll][individual1_ind]
     ind2 = current_population[filtered_coll][individual2_ind]
-    child = dict()
-    child['_id'] = index
-    child['age'] = int((index - int(get_population_size()*0.6)) / int(get_population_size()*0.6 / 5)) \
-        + iteration \
-        + 1
+    child = {
+        "value": 0,
+        "_id": index,
+        "age": int((index - int(get_population_size() * 0.6)) / int(get_population_size() * 0.6 / 5)) + iteration + 1
+    }
     mutation_factor = get_mutation_factor()
-    PARAMS_TO_READ = GENERIC_PARAMS if is_generic() else HUMAN_PARAMS
+    params_to_read = GENERIC_PARAMS if is_generic() else HUMAN_PARAMS
     for parameter, value in ind1.items():
-        if parameter != '_id' and parameter != 'age' and parameter != 'value':
+        if parameter not in ["_id", "age", "value"]:
             child[parameter] = round(
                 float(np.clip(
                     (ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
                                                                              1 + mutation_factor),
-                    PARAMS_TO_READ[parameter][0] * 0.8,
-                    PARAMS_TO_READ[parameter][1] * 1.2)),
+                    params_to_read[parameter][0] * 0.8,
+                    params_to_read[parameter][1] * 1.2)),
                 3
             )
-    child['value'] = 0
-    reproduction_collection = f'{"_".join(filtered_coll.split("_")[:-1])}_{"reproduction"}'
+    reproduction_collection = f"{'_'.join(filtered_coll.split('_')[:-1])}_reproduction"
     current_population[reproduction_collection].append(child)
     return index

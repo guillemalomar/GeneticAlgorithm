@@ -15,18 +15,18 @@ class MongodbDbWrapper:
         Creates the connection with the DB, and recreates the initial connection for a clean execution
         """
         self.params = params
-        if 'user' in self.params:
+        if "user" in self.params:
             self.client = MongoClient(
-                username=self.params['user'],
-                password=self.params['pass'],
-                host=self.params['host'],
-                port=self.params['port'],
+                username=self.params["user"],
+                password=self.params["pass"],
+                host=self.params["host"],
+                port=self.params["port"],
                 connect=True
             )
         else:
             self.client = MongoClient(
-                host=self.params['host'],
-                port=self.params['port'],
+                host=self.params["host"],
+                port=self.params["port"],
                 connect=True
             )
         self.db = None
@@ -38,51 +38,51 @@ class MongodbDbWrapper:
         Checks if the database exists in Mongo, deletes it if exists, and then creates a clean DB.
         """
         try:
-            if self.params['database'] in self.client.list_database_names():
-                self.delete_database(self.params['database'])
-            self.create_database(self.params['database'])
-            logging.debug(MONGO_MESSAGES["MONGODB_CONN_SUCC"])
+            if self.params["database"] in self.client.list_database_names():
+                self.delete_database(self.params["database"])
+            self.create_database(self.params["database"])
+            logging.debug(MONGO_MESSAGES["MONGODB_CONN_SUCCESS"])
         except pymongo.errors.ServerSelectionTimeoutError as exc:
-            logging.error(MONGO_MESSAGES["MONGODB_CONN_ERR".format(exc)])
+            logging.error(MONGO_MESSAGES["MONGODB_CONN_ERROR".format(exc)])
             sys.exit()
 
     def create_database(self, db_name):
         try:
             self.db = self.client[db_name]
-            logging.debug(MONGO_MESSAGES["MONGODB_SUCC_CRE_DB"].format(db_name))
+            logging.debug(MONGO_MESSAGES["MONGODB_SUCCESS_CREATING_DB"].format(db_name))
         except Exception as exc:
-            logging.error(MONGO_MESSAGES["MONGODB_ERR_CRE_DB"].format(db_name, exc))
+            logging.error(MONGO_MESSAGES["MONGODB_ERROR_CREATING_DB"].format(db_name, exc))
 
     def delete_database(self, db_name):
         try:
             self.client.drop_database(db_name)
-            logging.debug(MONGO_MESSAGES["MONGODB_SUCC_DEL_DB"].format(db_name))
+            logging.debug(MONGO_MESSAGES["MONGODB_SUCCESS_DELETING_DB"].format(db_name))
         except Exception as exc:
-            logging.error(MONGO_MESSAGES["MONGODB_ERR_DEL_DB"].format(db_name, exc))
+            logging.error(MONGO_MESSAGES["MONGODB_ERROR_DELETING_DB"].format(db_name, exc))
 
     def create_collection(self, collection_name):
         try:
-            self.collections['{collection_name}'] = \
-                MongodbCollectionWrapper(f'{collection_name}', self.db[f'{collection_name}'])
+            self.collections["{collection_name}"] = \
+                MongodbCollectionWrapper(f"{collection_name}", self.db[f"{collection_name}"])
             logging.debug(MONGO_MESSAGES["MONGODB_SUCC_CRE_COLL"].format(collection_name))
         except Exception as exc:
             logging.error(MONGO_MESSAGES["MONGODB_ERR_CRE_COLL"].format(collection_name, exc))
 
     def delete_collection(self, collection_name):
         try:
-            self.collections[f'{collection_name}'].drop()
+            self.collections[f"{collection_name}"].drop()
             logging.debug(MONGO_MESSAGES["MONGODB_SUCC_DEL_COLL"].format(collection_name))
         except Exception as exc:
             logging.error(MONGO_MESSAGES["MONGODB_ERR_DEL_COLL".format(collection_name, exc)])
 
     def insert_document(self, collection_name, document):
-        self.collections[f'{collection_name}'].insert_one(document)
+        self.collections[f"{collection_name}"].insert_one(document)
 
     def insert_documents(self, collection_name, documents):
-        self.collections[f'{collection_name}'].insert_many(documents)
+        self.collections[f"{collection_name}"].insert_many(documents)
 
     def obtain_all_documents(self, collection_name):
-        return self.collections[f'{collection_name}'].find({})
+        return self.collections[f"{collection_name}"].find({})
 
     def __setitem__(self, key, value):
         if key not in self.collections:
@@ -93,7 +93,7 @@ class MongodbDbWrapper:
         if collection_name not in self.collections:
             self.collections[collection_name] = MongodbCollectionWrapper(
                 collection_name,
-                self.db[f'{collection_name}']
+                self.db[f"{collection_name}"]
             )
         return self.collections[collection_name]
 
@@ -111,24 +111,24 @@ class MongodbCollectionWrapper:
         self.collection = collection
 
     def __setitem__(self, key, value):
-        self.collection.delete_one({'_id': key})
-        result = self.collection.replace_one({'_id': key}, value)
+        self.collection.delete_one({"_id": key})
+        result = self.collection.replace_one({"_id": key}, value)
         if result.matched_count == 0:
-            value['_id'] = key
+            value["_id"] = key
             self.collection.insert_one(value)
 
     def __getitem__(self, item):
         if not isinstance(item, slice):
-            return self.collection.find_one({'_id': item})
+            return self.collection.find_one({"_id": item})
         else:
             return self.collection.find({})
 
     def remove(self, key):
-        self.collection.delete_one({'_id': key})
+        self.collection.delete_one({"_id": key})
 
     def pop(self, key=None):
         if key:
-            self.collection.delete_one({'_id': key})
+            self.collection.delete_one({"_id": key})
 
     def append(self, item):
         self.collection.insert_one(item)
@@ -137,7 +137,7 @@ class MongodbCollectionWrapper:
         self.collection.insert_many(item)
 
     def sort(self, key, reverse):
-        to_sort = str(key).split('\'')[1]
+        to_sort = str(key).split("\"")[1]
         reverse = -1 if reverse else 1
         for idx, item in enumerate(self.collection.find({}).sort(to_sort, reverse)):
             self[idx] = item
@@ -158,7 +158,7 @@ class MongodbCollectionWrapper:
             else:
                 return self.collection.find(my_dict).sort(sort[0], sort[1])
         else:
-                return self.collection.find(my_dict)
+            return self.collection.find(my_dict)
 
     def drop(self):
         self.collection.drop()

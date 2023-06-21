@@ -25,49 +25,49 @@ def args_handler(argv):
     :rtype: a list of the final application input parameters
     """
     p = argparse.ArgumentParser(
-        description='Genetic Algorithm',
+        description="Genetic Algorithm",
         formatter_class=argparse.RawTextHelpFormatter
     )
 
-    p.add_argument('-a', '--about', action='store_true',
+    p.add_argument("-a", "--about", action="store_true",
                    default=False,
-                   help='(flag) obtain a breve about the application')
+                   help="(flag) obtain a breve about the application")
 
-    p.add_argument('-db', '--database', action='store', type=str,
+    p.add_argument("-db", "--database", action="store", type=str,
                    default="No db",
-                   help='(string) activate database [MongoDB, MySQL]')
+                   help="(string) activate database [MongoDB, MySQL]")
 
-    p.add_argument('-g', '--generic', action='store_true',
+    p.add_argument("-g", "--generic", action="store_true",
                    default=False,
-                   help='(flag) activate generic mode, to use the parameters in the settings/generic_model.py file')
+                   help="(flag) activate generic mode, to use the parameters in the settings/generic_model.py file")
 
-    p.add_argument('-n', '--name', action='store', type=str,
+    p.add_argument("-n", "--name", action="store", type=str,
                    default="Not defined",
-                   help='(text) name of the single execution')
+                   help="(text) name of the single execution")
 
-    p.add_argument('-p', '--params', action='store', type=str,
+    p.add_argument("-p", "--params", action="store", type=str,
                    default="Not defined",
-                   help='(text) comma separated parameters for the single execution')
+                   help="(text) comma separated parameters for the single execution")
 
-    p.add_argument('-m', '--multiple', action='store_true',
+    p.add_argument("-m", "--multiple", action="store_true",
                    default=False,
-                   help='(flag) activate multiple mode, to execute many environments at once')
+                   help="(flag) activate multiple mode, to execute many environments at once")
 
-    p.add_argument('-e', '--elitist', action='store_true',
+    p.add_argument("-e", "--elitist", action="store_true",
                    default=elitism,
-                   help='(flag) pair individuals with other with a similar fitness value, instead of randomly')
+                   help="(flag) pair individuals with other with a similar fitness value, instead of randomly")
 
-    p.add_argument('-pop', '--population', action='store', type=int,
+    p.add_argument("-pop", "--population", action="store", type=int,
                    default=initial_population_size,
-                   help='(int) initial population size')
+                   help="(int) initial population size")
 
-    p.add_argument('-i', '--iterations', action='store', type=int,
+    p.add_argument("-i", "--iterations", action="store", type=int,
                    default=max_iterations,
-                   help='(integer) number of iterations to run')
+                   help="(integer) number of iterations to run")
 
-    p.add_argument('-mf', '--mutationfactor', action='store', type=float,
+    p.add_argument("-mf", "--mutationfactor", action="store", type=float,
                    default=mutation_factor,
-                   help='(float) mutation factor')
+                   help="(float) mutation factor")
 
     return p.parse_args(argv[1:])
 
@@ -88,7 +88,7 @@ def check_input(args):
     if args.params != "Not defined":
         try:
             print(args.params)
-            exec_params = args.params.split(',')
+            exec_params = args.params.split(",")
             print(exec_params)
             args.params = [float(param) for param in exec_params]
         except TypeError:

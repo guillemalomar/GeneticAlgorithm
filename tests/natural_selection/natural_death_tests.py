@@ -14,15 +14,15 @@ class NaturalDeathTests(unittest.TestCase):
         collection = []
         for i in range(0, get_population_size() + 100):
             ind = {
-                'age': i % 5,
-                'height': 1,
-                'arm_length': 0,
-                'speed': 10,
-                'strength': 1,
-                'jump': 0,
-                'skin_thickness': 0.05
+                "age": i % 5,
+                "height": 1,
+                "arm_length": 0,
+                "speed": 10,
+                "strength": 1,
+                "jump": 0,
+                "skin_thickness": 0.05
             }
             collection.append(ind)
-        population['Bla_1_reproduction'] = collection
-        new_pop = natural_death(1, population, 'Bla')
-        self.assertEqual(len(new_pop['Bla_2']), get_population_size())
+        population["Bla_1_reproduction"] = collection
+        new_pop = natural_death(1, population, "Bla")
+        self.assertEqual(len(new_pop["Bla_2"]), get_population_size())
