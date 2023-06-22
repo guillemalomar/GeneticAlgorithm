@@ -1,10 +1,10 @@
 HUMAN_PARAMS = {
     'height': [1, 1.5],
     'arm_length': [0, 0.5],
-    'speed': [9, 10],
+    'speed': [10, 20],
     'strength': [1, 10],
     'jump': [0, 0.5],
-    'skin_thickness': [0.03, 0.05]
+    'skin_thickness': [0.05, 0.35]
 }
 
 HUMAN_WEIGHTS = {

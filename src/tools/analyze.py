@@ -68,7 +68,7 @@ class PopulationAnalysis:
             for individual in current_population[coll_name]:
                 fits = True
                 for param, value in individual.items():
-                    if param != "_id" and param != "age" and param != "value":
+                    if param not in ["_id", "age", "value"]:
                         self.averages[param] += value
                         if fits and \
                            not (GENERIC_ENVIRONMENT_DEFAULT[param]-2 < value < GENERIC_ENVIRONMENT_DEFAULT[param]+2):

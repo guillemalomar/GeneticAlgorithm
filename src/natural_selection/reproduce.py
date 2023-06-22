@@ -145,7 +145,7 @@ async def pair_individuals(current_population, list_of_pairs, iteration, filtere
     return responses
 
 
-async def obtain_children(index, iteration, individual1_ind, individual2_ind, current_population, filtered_coll):
+async def obtain_children(index, iteration, individual1_ind, individual2_ind, current_population, filtered_coll_name):
     """
     This method takes the indexes of the new child parents, obtains the parents parameters, and creates the
     new child parameters from the average of each of the parents parameters, adding a small mutation factor
@@ -155,17 +155,17 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
     :type iteration: int
     :param individual1_ind: parent 1 _id
     :type individual1_ind: int
-    :param individual2_ind: parent 1 _id
+    :param individual2_ind: parent 2 _id
     :type individual2_ind: int
     :param current_population: individuals to reproduce
     :type current_population: list or DBWrapper
-    :param filtered_coll: name of the filtered collection
-    :type filtered_coll: str
+    :param filtered_coll_name: name of the filtered collection
+    :type filtered_coll_name: str
     :return: obtained child or _id of the new child
-    :rtype: dict or int
+    :rtype: int
     """
-    ind1 = current_population[filtered_coll][individual1_ind]
-    ind2 = current_population[filtered_coll][individual2_ind]
+    ind1 = current_population[filtered_coll_name][individual1_ind]
+    ind2 = current_population[filtered_coll_name][individual2_ind]
     child = {
         "value": 0,
         "_id": index,
@@ -177,12 +177,11 @@ async def obtain_children(index, iteration, individual1_ind, individual2_ind, cu
         if parameter not in ["_id", "age", "value"]:
             child[parameter] = round(
                 float(np.clip(
-                    (ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor,
-                                                                             1 + mutation_factor),
+                    (ind1[parameter] + ind2[parameter]) / 2 * random.uniform(1 - mutation_factor, 1 + mutation_factor),
                     params_to_read[parameter][0] * 0.8,
                     params_to_read[parameter][1] * 1.2)),
                 3
             )
-    reproduction_collection = f"{'_'.join(filtered_coll.split('_')[:-1])}_reproduction"
+    reproduction_collection = f"{'_'.join(filtered_coll_name.split('_')[:-1])}_reproduction"
     current_population[reproduction_collection].append(child)
     return index
