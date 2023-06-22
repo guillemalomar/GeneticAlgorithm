@@ -1,8 +1,9 @@
 import logging
 import matplotlib.pyplot as plt
 
-from settings.human_model import HUMAN_PARAMS
 from settings.generic_model import GENERIC_PARAMS
+from settings.human_model import HUMAN_PARAMS
+from settings.settings import max_iterations
 from src import is_generic, get_population_size
 
 
@@ -78,6 +79,7 @@ class PlotWrapper:
             self.ax4.axhline(y=environment_data["tree_height"], c="blue", linewidth=0.5, zorder=0)
             environment_params = "\n".join([f"{key}: {value}" for key, value in environment_data.items()])
             self.ax6.text(0.2, 0.5, environment_params, horizontalalignment="left", verticalalignment="center", size=15)
+            self.ax6.text(0.2, 0.1, f"max_iterations: {max_iterations}", horizontalalignment="left", verticalalignment="center", size=15)
             self.ax6.axis("off")
         else:
             for key in environment_data.keys():
