@@ -21,7 +21,7 @@ class PopulationAnalysis:
                 "fitting": 0,
                 "value": 0
             }
-        self.environment = environment
+        self.__environment = environment
         self.iteration = iteration
 
     def analyze_population(self, current_population, environment_name, iteration):
@@ -48,11 +48,11 @@ class PopulationAnalysis:
                     to_evaluate += 1
                 reach = individual["height"] + individual["arm_length"] + individual["jump"]
                 total_reach += reach
-                if (reach > self.environment["tree_height"] or
-                    (individual["speed"] > self.environment["food_animals_speed"] and
-                     individual["strength"] > self.environment["food_animals_strength"])) and \
-                        is_fast_enough(individual, self.environment) and \
-                        is_warm_enough(individual, self.environment):
+                if (reach > self.__environment["tree_height"] or
+                    (individual["speed"] > self.__environment["food_animals_speed"] and
+                     individual["strength"] > self.__environment["food_animals_strength"])) and \
+                        is_fast_enough(individual, self.__environment) and \
+                        is_warm_enough(individual, self.__environment):
                     total_fitting += 1
             self.averages = {
                 "speed": total_speed / get_population_size(),
@@ -93,13 +93,12 @@ class PopulationAnalysis:
         otherwise
         :rtype: boolean
         """
-        if self.averages["value"] >= 0.7:
-            if self.averages["fitting"] >= int(get_population_size() * 0.80):
-                total_dif = 0
-                for key, val in self.averages.items():
-                    total_dif += abs(val - prev_analysis.averages[key])
-                if total_dif < 1:
-                    return True
-            if self.averages["fitting"] >= int(get_population_size() * 0.95):
+        if self.averages["fitting"] >= int(get_population_size() * 0.80):
+            total_difference = 0
+            for key, val in self.averages.items():
+                total_difference += abs(val - prev_analysis.averages[key])
+            if total_difference < 0.1:
                 return True
+        if self.averages["fitting"] >= int(get_population_size() * 0.95):
+            return True
         return False
